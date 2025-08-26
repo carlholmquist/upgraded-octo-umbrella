@@ -37,12 +37,12 @@ export const siteConfig = {
   ],
   experience: [
     {
-      company: "Tech Company",
-      title: "Senior Software Engineer",
-      dateRange: "Jan 2022 - Present",
+      company: "Holmen Wood Products",
+      title: "Production manager - Kiln & Grading",
+      dateRange: "Aug 2023 - Present",
       bullets: [
-        "Led development of microservices architecture serving 1M+ users",
-        "Reduced API response times by 40% through optimization",
+        "Managed 30+ machine operators, leaders and technicians",
+        "Managed and planned fixed and variable cost budget $7M+ a year",
         "Mentored team of 5 junior developers",
       ],
     },
