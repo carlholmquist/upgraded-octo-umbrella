@@ -5,9 +5,9 @@ export const siteConfig = {
   accentColor: "#409c44",
   social: {
     email: "carl@holmquist.studio",
-    linkedin: "https://linkedin.com/in/yourprofile",
-    twitter: "https://x.com/rfitzio",
-    github: "https://github.com/RyanFitzgerald",
+    linkedin: "https://linkedin.com/in/carl-holmquist-830971137",
+    twitter: "https://x.com",
+    github: "https://github.com/carlholmquist",
   },
   aboutMe:
     "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rem quos asperiores nihil consequatur tempore cupiditate architecto natus commodi corrupti quas quasi facere est, dignissimos odit nam veniam sapiente ut, vitae eligendi ipsum dolor, nostrum ullam impedit! Corrupti ratione mollitia temporibus necessitatibus, consectetur reiciendis recusandae id, dolorum quaerat, vero pariatur. Ratione!",
@@ -47,9 +47,9 @@ export const siteConfig = {
       ],
     },
     {
-      company: "Startup Inc",
-      title: "Full Stack Developer",
-      dateRange: "Jun 2020 - Dec 2021",
+      company: "DWS Printing & Packaging",
+      title: "Plant manager",
+      dateRange: "Nov 2020 - Jan 2023",
       bullets: [
         "Built and launched MVP product from scratch using React and Node.js",
         "Implemented CI/CD pipeline reducing deployment time by 60%",
@@ -69,13 +69,13 @@ export const siteConfig = {
   ],
   education: [
     {
-      school: "University Name",
-      degree: "Bachelor of Science in Computer Science",
-      dateRange: "2014 - 2018",
+      school: "Luleå University of Technology",
+      degree: "Masters in Architectural Engineering, specialization in building design",
+      dateRange: "2015 - 2020",
       achievements: [
-        "Graduated Magna Cum Laude with 3.8 GPA",
-        "Dean's List all semesters",
-        "President of Computer Science Club",
+        "Maths",
+        "Programming, cad and BIM",
+        "Engineering",
       ],
     },
     {
