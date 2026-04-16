@@ -24,6 +24,13 @@ export const siteConfig = {
   ],
   projects: [
     {
+      name: "Ghost — Private Location Journal",
+      description:
+        "Ghost is a private location journal for iPhone that silently builds a daily timeline of where you've been — no accounts, no cloud sync, nothing leaves the device. Rather than streaming GPS, it runs on iOS's CLVisit API, which fires discrete arrival and departure events at the OS level, keeping battery impact minimal. The engineering challenge was making passively detected data feel polished: matching raw CLVisit coordinates to saved places within a 150m radius, reconstructing routes as MapKit polylines, and handling overlapping pins with a tap disambiguation sheet modeled after Apple Maps. State across a 2,600-line SwiftUI codebase is managed through @Observable classes, with all data stored on-device via SwiftData.",
+      link: "",
+      skills: ["Swift", "SwiftUI", "SwiftData", "MapKit", "CoreLocation"],
+    },
+    {
       name: "Mechanical Properties of Swedish-Grown Lodgepole Pine",
       description:
         "MSc thesis investigating correlations between wood anatomy and mechanical properties in Swedish-grown lodgepole pine (Pinus contorta). Analyzed 432 timber specimens from four geographic locations across Sweden, measuring ring width, latewood ratio, and swelling against bending strength, modulus of elasticity, and density. Developed a custom Python image analysis pipeline to automate cross-sectional measurements from high-resolution timber scans. Statistical analysis included Pearson correlation and one-way ANOVA. Conducted in collaboration with RISE Research Institutes of Sweden and Holmen Trävaror.",
