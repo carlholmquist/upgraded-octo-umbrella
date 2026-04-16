@@ -41,10 +41,10 @@ function full(path: string) {
         <p class="text-lg text-gray-500">Personal work</p>
       </header>
 
-      <div class="columns-1 sm:columns-2 gap-4 space-y-4">
+      <div class={`grid gap-4 ${photos.length === 1 ? "grid-cols-1" : "grid-cols-1}`}>
         {photos.map((photo, i) => (
           <button
-            class="block w-full break-inside-avoid cursor-zoom-in"
+            class="block w-full cursor-zoom-in"
             data-full={full(photo.path)}
             data-index={i}
             aria-label={photo.caption ?? `Photo ${i + 1}`}
