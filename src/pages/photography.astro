@@ -1,0 +1,123 @@
+---
+import "../styles/global.css";
+
+const cloudName = "drey6ump8";
+
+const photos: { path: string; caption?: string }[] = [
+  { path: "v1776373536/DSCF0284_c5tskx.jpg" },
+];
+
+function thumb(path: string) {
+  return `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto,w_800/${path}`;
+}
+
+function full(path: string) {
+  return `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto,w_1800/${path}`;
+}
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="Photography by Carl Holmquist" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Photography — Carl Holmquist</title>
+  </head>
+  <body class="bg-white text-gray-800 min-h-screen">
+    <div class="mx-auto max-w-3xl px-6 py-16 lg:px-8">
+
+      <header class="mb-12">
+        <p class="text-xs text-gray-400 uppercase tracking-widest mb-3">
+          <a href="/" class="hover:text-gray-600 transition-colors">Carl Holmquist</a>
+        </p>
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">Photography</h1>
+        <p class="text-lg text-gray-500">Personal work</p>
+      </header>
+
+      <div class="columns-1 sm:columns-2 gap-4 space-y-4">
+        {photos.map((photo, i) => (
+          <button
+            class="block w-full break-inside-avoid cursor-zoom-in"
+            data-full={full(photo.path)}
+            data-index={i}
+            aria-label={photo.caption ?? `Photo ${i + 1}`}
+          >
+            <img
+              src={thumb(photo.path)}
+              alt={photo.caption ?? ""}
+              loading="lazy"
+              class="w-full rounded-sm"
+            />
+            {photo.caption && (
+              <p class="mt-1.5 text-xs text-gray-400 text-left">{photo.caption}</p>
+            )}
+          </button>
+        ))}
+      </div>
+
+      <footer class="mt-16 pt-4 border-t border-gray-100">
+        <p class="text-xs text-gray-400">© {new Date().getFullYear()} Carl Holmquist</p>
+      </footer>
+
+    </div>
+
+    <!-- Lightbox -->
+    <div
+      id="lightbox"
+      class="fixed inset-0 bg-black/90 z-50 hidden items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+    >
+      <button
+        id="lightbox-close"
+        class="absolute top-5 right-6 text-white/60 hover:text-white text-3xl leading-none transition-colors"
+        aria-label="Close"
+      >
+        ×
+      </button>
+      <img
+        id="lightbox-img"
+        src=""
+        alt=""
+        class="max-h-[90vh] max-w-full object-contain rounded-sm"
+      />
+    </div>
+
+    <script>
+      const lightbox = document.getElementById("lightbox")!;
+      const lightboxImg = document.getElementById("lightbox-img") as HTMLImageElement;
+      const closeBtn = document.getElementById("lightbox-close")!;
+
+      document.querySelectorAll<HTMLButtonElement>("[data-full]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          lightboxImg.src = btn.dataset.full!;
+          lightbox.classList.remove("hidden");
+          lightbox.classList.add("flex");
+          document.body.style.overflow = "hidden";
+        });
+      });
+
+      function closeLightbox() {
+        lightbox.classList.add("hidden");
+        lightbox.classList.remove("flex");
+        lightboxImg.src = "";
+        document.body.style.overflow = "";
+      }
+
+      closeBtn.addEventListener("click", closeLightbox);
+      lightbox.addEventListener("click", (e) => {
+        if (e.target === lightbox) closeLightbox();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeLightbox();
+      });
+    </script>
+  </body>
+</html>

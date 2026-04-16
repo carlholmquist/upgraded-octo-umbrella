@@ -1,8 +1,8 @@
 export const siteConfig = {
   name: "Carl Holmquist",
-  title: "Engineer | MSc Building Design | FE Civil Candidate | Southern California",
+  title: "Engineer | MSc Building Design | Houston, Texas",
   description:
-    "Portfolio and professional profile of Carl Holmquist — Engineer, MSc Building Design, FE Civil Candidate based in Southern California.",
+    "Portfolio and professional profile of Carl Holmquist — Engineer, MSc Building Design, Based in Houston, Texas.",
   accentColor: "#409c44",
   social: {
     email: "carl@holmquist.studio",
@@ -11,7 +11,7 @@ export const siteConfig = {
     github: "https://github.com/carlholmquist",
   },
   aboutMe:
-    "Engineer with a broad technical background spanning structural materials research, manufacturing operations, and hands-on construction. I hold an MSc in Engineering, Building Design from Luleå University of Technology and am currently pursuing FE Civil licensure as I transition into building engineering in Southern California.\n\nMy career has given me an unusually wide perspective — leading production operations with full budget responsibility in the millions, managing multidisciplinary teams, and delivering complex technical projects from planning through execution. Along the way I have developed a genuine enthusiasm for computational problem solving, applying programming and data tools to real engineering and operational challenges.\n\nThis breadth is grounded in technical depth, including structural materials research conducted in collaboration with RISE Research Institutes of Sweden and Holmen Trävaror for my MSc thesis.\n\nI'm drawn to technical work that combines engineering depth with real-world complexity. Long term I'm building toward founding my own engineering practice.",
+    "Engineer with a broad technical background spanning structural materials research, manufacturing operations, and hands-on construction. I hold an MSc in Engineering, Building Design from Luleå University of Technology and am currently pursuing FE Civil licensure as I transition into building engineering in Southern California.\n\nMy career has given me an unusually wide perspective — leading production operations with full budget responsibility in the millions, managing multidisciplinary teams, and delivering complex technical projects from planning through execution. Along the way I have developed a genuine enthusiasm for computational problem solving, applying programming and data tools to real engineering and operational challenges.\n\nThis breadth is grounded in technical depth, including structural materials research conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products for my MSc thesis.\n\nI'm drawn to technical work that combines engineering depth with real-world complexity. Long term I'm building toward founding my own engineering practice.",
   skills: [
     "Python",
     "SQL",
@@ -33,7 +33,7 @@ export const siteConfig = {
     {
       name: "Mechanical Properties of Swedish-Grown Lodgepole Pine",
       description:
-        "MSc thesis investigating correlations between wood anatomy and mechanical properties in Swedish-grown lodgepole pine (Pinus contorta). Analyzed 432 timber specimens from four geographic locations across Sweden, measuring ring width, latewood ratio, and swelling against bending strength, modulus of elasticity, and density. Developed a custom Python image analysis pipeline to automate cross-sectional measurements from high-resolution timber scans. Statistical analysis included Pearson correlation and one-way ANOVA. Conducted in collaboration with RISE Research Institutes of Sweden and Holmen Trävaror.",
+        "MSc thesis investigating correlations between wood anatomy and mechanical properties in Swedish-grown lodgepole pine (Pinus contorta). Analyzed 432 timber specimens from four geographic locations across Sweden, measuring ring width, latewood ratio, and swelling against bending strength, modulus of elasticity, and density. Developed a custom Python image analysis pipeline to automate cross-sectional measurements from high-resolution timber scans. Statistical analysis included Pearson correlation and one-way ANOVA. Conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products.",
       link: "",
       skills: ["Python", "Statistical analysis", "Structural materials"],
     },
@@ -83,7 +83,7 @@ export const siteConfig = {
       dateRange: "2015 – 2020",
       achievements: [
         "Degree validated by NCEES without deficiencies",
-        "Thesis conducted in collaboration with RISE Research Institutes of Sweden and Holmen Trävaror",
+        "Thesis conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products",
         "Coursework spanning structural engineering, building physics, and computational methods",
       ],
     },
