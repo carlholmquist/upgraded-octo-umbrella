@@ -1,0 +1,121 @@
+---
+import "../styles/global.css";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="Privacy Policy for Ghost — Personal Location Journal" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Ghost — Privacy Policy</title>
+  </head>
+  <body class="bg-white text-gray-800 min-h-screen">
+    <div class="mx-auto max-w-3xl px-6 py-16 lg:px-8">
+
+      <header class="mb-12">
+        <p class="text-xs text-gray-400 uppercase tracking-widest mb-3">iOS App</p>
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">Ghost</h1>
+        <p class="text-lg text-gray-500">Privacy Policy</p>
+      </header>
+
+      <div class="space-y-10 text-sm leading-relaxed text-gray-700">
+
+        <section>
+          <p>
+            Ghost is a personal location journal. It runs quietly in the background, detects when
+            you arrive at and leave places, and builds a private daily timeline — entirely on your
+            device. Your data belongs to you and only you.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-base font-semibold text-gray-900 mb-3">Information Collected</h2>
+          <p class="mb-3">
+            Ghost uses Apple's <span class="font-medium">CLVisit API</span> to detect significant arrivals
+            and departures. This requires "Always On" background location permission. The app records:
+          </p>
+          <ul class="list-disc list-inside space-y-1 pl-2">
+            <li>Visit timestamps (arrival and departure times)</li>
+            <li>Approximate location coordinates of visited places</li>
+            <li>Place names and labels you assign manually</li>
+          </ul>
+          <p class="mt-3">
+            The app does <span class="font-medium">not</span> perform continuous GPS tracking. Location
+            is only sampled at the moment a visit event is triggered by the operating system.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-base font-semibold text-gray-900 mb-3">How It's Used</h2>
+          <p>
+            Location data is used solely to build your personal timeline within the app. It is never
+            used for advertising, profiling, analytics, or any purpose beyond displaying your own
+            history back to you.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-base font-semibold text-gray-900 mb-3">Data Storage</h2>
+          <p>
+            All data — visit records, saved places, routes, and your full location history — is stored
+            exclusively in the app's local SwiftData database on your iPhone. There is no account,
+            no login, and no backend server. The developer has no ability to access, view, or retrieve
+            any of your data.
+          </p>
+          <p class="mt-3">
+            You can delete all stored data at any time from within the app via
+            <span class="font-medium">Settings → Clear All Data</span>.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-base font-semibold text-gray-900 mb-3">Third Parties</h2>
+          <p>
+            Ghost contains no analytics SDKs, no advertising frameworks, no crash reporting services,
+            and no third-party trackers of any kind. Nothing is uploaded to or shared with any external
+            service.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-base font-semibold text-gray-900 mb-3">Children's Privacy</h2>
+          <p>
+            Ghost does not collect any personal data from anyone, including children under the age of
+            13. Because all data remains on-device and is never transmitted, the app does not implicate
+            COPPA or similar children's privacy regulations. Ghost is not directed at children.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-base font-semibold text-gray-900 mb-3">Contact</h2>
+          <p>
+            If you have questions about this privacy policy or the app, you can reach the developer by
+            email. Feedback sent from within the app composes an email on your device — nothing is
+            transmitted automatically. Any log lines attached to a feedback email are included only
+            with your explicit knowledge and action.
+          </p>
+          <p class="mt-3">
+            <a
+              href="mailto:carl@holmquist.studio"
+              class="underline underline-offset-2 hover:text-gray-900 transition-colors"
+            >
+              carl@holmquist.studio
+            </a>
+          </p>
+        </section>
+
+        <section class="pt-4 border-t border-gray-100">
+          <p class="text-xs text-gray-400">Last updated: April 16, 2026</p>
+        </section>
+
+      </div>
+    </div>
+  </body>
+</html>

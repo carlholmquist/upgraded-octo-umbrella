@@ -1,75 +1,84 @@
 export const siteConfig = {
   name: "Carl Holmquist",
-  title: "Production manager",
-  description: "Portfolio website of Carl Holmquist",
+  title: "Engineer | MSc Building Design | FE Civil Candidate | Southern California",
+  description:
+    "Portfolio and professional profile of Carl Holmquist — Engineer, MSc Building Design, FE Civil Candidate based in Southern California.",
   accentColor: "#409c44",
   social: {
     email: "carl@holmquist.studio",
     linkedin: "https://linkedin.com/in/carl-holmquist-830971137",
-    twitter: "https://x.com",
+    twitter: "",
     github: "https://github.com/carlholmquist",
   },
   aboutMe:
-    "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rem quos asperiores nihil consequatur tempore cupiditate architecto natus commodi corrupti quas quasi facere est, dignissimos odit nam veniam sapiente ut, vitae eligendi ipsum dolor, nostrum ullam impedit! Corrupti ratione mollitia temporibus necessitatibus, consectetur reiciendis recusandae id, dolorum quaerat, vero pariatur. Ratione!",
-  skills: ["Javascript", "React", "Node.js", "Python", "AWS", "Docker"],
+    "Engineer with a broad technical background spanning structural materials research, manufacturing operations, and hands-on construction. I hold an MSc in Engineering, Building Design from Luleå University of Technology and am currently pursuing FE Civil licensure as I transition into building engineering in Southern California.\n\nMy career has given me an unusually wide perspective — leading production operations with full budget responsibility in the millions, managing multidisciplinary teams, and delivering complex technical projects from planning through execution. Along the way I have developed a genuine enthusiasm for computational problem solving, applying programming and data tools to real engineering and operational challenges.\n\nThis breadth is grounded in technical depth, including structural materials research conducted in collaboration with RISE Research Institutes of Sweden and Holmen Trävaror for my MSc thesis.\n\nI'm drawn to technical work that combines engineering depth with real-world complexity. Long term I'm building toward founding my own engineering practice.",
+  skills: [
+    "Python",
+    "SQL",
+    "Power BI",
+    "Data workflow automation",
+    "Structural materials analysis",
+    "Project management",
+    "Operations management",
+    "Budget management",
+  ],
   projects: [
     {
-      name: "AI Dev Roundup Newsletter",
+      name: "Mechanical Properties of Swedish-Grown Lodgepole Pine",
       description:
-        "One concise email. Five minutes. Every Tuesday. Essential AI news & trends, production-ready libraries, powerful AI tools, and real-world code examples",
-      link: "https://aidevroundup.com/?ref=devportfolio",
-      skills: ["React", "Node.js", "AWS"],
+        "MSc thesis investigating correlations between wood anatomy and mechanical properties in Swedish-grown lodgepole pine (Pinus contorta). Analyzed 432 timber specimens from four geographic locations across Sweden, measuring ring width, latewood ratio, and swelling against bending strength, modulus of elasticity, and density. Developed a custom Python image analysis pipeline to automate cross-sectional measurements from high-resolution timber scans. Statistical analysis included Pearson correlation and one-way ANOVA. Conducted in collaboration with RISE Research Institutes of Sweden and Holmen Trävaror.",
+      link: "",
+      skills: ["Python", "Statistical analysis", "Structural materials"],
+    },
+    {
+      name: "Future project",
+      description:
+        "Placeholder for upcoming projects. Check back soon.",
+      link: "",
+      skills: [],
     },
   ],
   experience: [
     {
       company: "Holmen Wood Products",
-      title: "Production manager - Kiln & Grading",
-      dateRange: "Aug 2023 - Present",
+      title: "Operations Manager",
+      dateRange: "Aug 2023 – Present",
       bullets: [
-        "Managed 30+ machine operators, leaders and technicians",
-        "Managed and planned fixed and variable cost budget $7M+ a year",
-        "Mentored team of 5 junior developers",
+        "Led production operations across grading mills and kilns in a sawmill environment",
+        "Managed multidisciplinary teams including operators, technicians, and shift leaders",
+        "Held full budget responsibility in the millions, covering fixed and variable costs",
+        "Served on executive team contributing to strategy, policy, and financial decisions",
       ],
     },
     {
       company: "DWS Printing & Packaging",
-      title: "Plant manager",
-      dateRange: "Nov 2020 - Jan 2023",
+      title: "Project Manager",
+      dateRange: "Nov 2020 – Jan 2023",
       bullets: [
-        "Built and launched MVP product from scratch using React and Node.js",
-        "Implemented CI/CD pipeline reducing deployment time by 60%",
-        "Collaborated with product team to define technical requirements",
-      ],
-    },
-    {
-      company: "Holmen Board & Paper",
-      title: "Machine Operator",
-      dateRange: "May 2015 - Aug 2017",
-      bullets: [
-        "Running sheeting machine 9, producing up to 100 tonnes of sheeted paper board per day",
+        "Delivered installation of a large-scale industrial heat exchanger system",
+        "Coordinated consulting engineers, contractors, pipe fitters, accredited inspectors, and suppliers",
+        "Managed project within technical and budgetary constraints from planning through commissioning",
       ],
     },
     {
       company: "Regmaster AB",
       title: "Carpenter",
-      dateRange: "Jan 2013 - Jan 2015",
+      dateRange: "Jan 2013 – Jan 2015",
       bullets: [
-        "Carpenter within the service industry as well as construction",
+        "Hands-on construction across service industry and new construction projects",
       ],
     },
   ],
   education: [
     {
       school: "Luleå University of Technology",
-      degree: "Masters in Architectural Engineering, specialization in building design",
-      dateRange: "2015 - 2020",
+      degree: "MSc in Engineering, Building Design",
+      dateRange: "2015 – 2020",
       achievements: [
-        "Maths",
-        "Programming, cad and BIM",
-        "Engineering",
+        "Degree validated by NCEES without deficiencies",
+        "Thesis conducted in collaboration with RISE Research Institutes of Sweden and Holmen Trävaror",
+        "Coursework spanning structural engineering, building physics, and computational methods",
       ],
     },
-    
   ],
 };
