@@ -14,7 +14,6 @@ export const siteConfig = {
     "Engineer with a broad technical background spanning structural materials research, manufacturing operations, and hands-on construction. I hold an MSc in Engineering, Building Design from Luleå University of Technology and am currently pursuing FE Civil licensure as I transition into building engineering in Southern California.\n\nMy career has given me an unusually wide perspective — leading production operations with full budget responsibility in the millions, managing multidisciplinary teams, and delivering complex technical projects from planning through execution. Along the way I have developed a genuine enthusiasm for computational problem solving, applying programming and data tools to real engineering and operational challenges.\n\nThis breadth is grounded in technical depth, including structural materials research conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products for my MSc thesis.\n\nI'm drawn to technical work that combines engineering depth with real-world complexity. Long term I'm building toward founding my own engineering practice.",
   skills: [
     "Python",
-    "SQL",
     "Power BI",
     "Data workflow automation",
     "Structural materials analysis",
@@ -37,34 +36,31 @@ export const siteConfig = {
       link: "",
       skills: ["Python", "Statistical analysis", "Structural materials"],
     },
-    {
-      name: "Future project",
-      description:
-        "Placeholder for upcoming projects. Check back soon.",
-      link: "",
-      skills: [],
-    },
   ],
   experience: [
     {
       company: "Holmen Wood Products",
-      title: "Operations Manager",
+      title: "Production Manager",
       dateRange: "Aug 2023 – Present",
       bullets: [
         "Led production operations across grading mills and kilns in a sawmill environment",
         "Managed multidisciplinary teams including operators, technicians, and shift leaders",
-        "Held full budget responsibility in the millions, covering fixed and variable costs",
+        "Held full budget responsibility for about $6 million, covering fixed and variable costs",
         "Served on executive team contributing to strategy, policy, and financial decisions",
+        "Delivered installation of a large-scale industrial heat exchanger system",
+        "Coordinated consulting engineers, contractors, pipe fitters, accredited inspectors, and suppliers",
+        "Managed project within technical and budgetary constraints from planning through commissioning",
       ],
     },
     {
       company: "DWS Printing & Packaging",
-      title: "Project Manager",
+      title: "Plant Manager",
       dateRange: "Nov 2020 – Jan 2023",
       bullets: [
-        "Delivered installation of a large-scale industrial heat exchanger system",
-        "Coordinated consulting engineers, contractors, pipe fitters, accredited inspectors, and suppliers",
-        "Managed project within technical and budgetary constraints from planning through commissioning",
+        "Built and operationalized company's first satellite production facility from the ground up, establishing workflows, staffing, and all operational functions"
+        "Scaled production to millions of labels per month serving large anchor clients and a growing craft brewery portfolio"
+        "Provided critical supply chain continuity to small breweries during COVID-19 disruption when large industry players dominated limited supply lines"
+        "Managed all plant functions concurrently including purchasing, logistics, quality assurance, people management and equipment maintenance"
       ],
     },
     {
@@ -80,11 +76,12 @@ export const siteConfig = {
     {
       school: "Luleå University of Technology",
       degree: "MSc in Engineering, Building Design",
-      dateRange: "2015 – 2020",
+      dateRange: "2015 – 2025",
       achievements: [
         "Degree validated by NCEES without deficiencies",
         "Thesis conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products",
         "Coursework spanning structural engineering, building physics, and computational methods",
+        "Main body of studies between 2015 and 2020, thesis defended 2023, degree awarded in 2025"
       ],
     },
   ],

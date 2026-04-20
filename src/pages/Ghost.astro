@@ -38,17 +38,10 @@ import "../styles/global.css";
         <section>
           <h2 class="text-base font-semibold text-gray-900 mb-3">Information Collected</h2>
           <p class="mb-3">
-            Ghost uses Apple's <span class="font-medium">CLVisit API</span> to detect significant arrivals
-            and departures. This requires "Always On" background location permission. The app records:
-          </p>
-          <ul class="list-disc list-inside space-y-1 pl-2">
-            <li>Visit timestamps (arrival and departure times)</li>
-            <li>Approximate location coordinates of visited places</li>
-            <li>Place names and labels you assign manually</li>
-          </ul>
-          <p class="mt-3">
-            The app does <span class="font-medium">not</span> perform continuous GPS tracking. Location
-            is only sampled at the moment a visit event is triggered by the operating system.
+            Ghost collects only your location history — the places you visit, the times you arrived and departed, and the route 
+            you travelled between them. This is recorded using iOS location services running in the background, which requires 
+            "Always On" location permission. All collected data is stored exclusively on your device and is never transmitted 
+            anywhere.
           </p>
         </section>
 
