@@ -57,10 +57,10 @@ export const siteConfig = {
       title: "Plant Manager",
       dateRange: "Nov 2020 – Jan 2023",
       bullets: [
-        "Built and operationalized company's first satellite production facility from the ground up, establishing workflows, staffing, and all operational functions"
-        "Scaled production to millions of labels per month serving large anchor clients and a growing craft brewery portfolio"
-        "Provided critical supply chain continuity to small breweries during COVID-19 disruption when large industry players dominated limited supply lines"
-        "Managed all plant functions concurrently including purchasing, logistics, quality assurance, people management and equipment maintenance"
+        "Built and operationalized company's first satellite production facility from the ground up, establishing workflows, staffing, and all operational functions",
+        "Scaled production to millions of labels per month serving large anchor clients and a growing craft brewery portfolio",
+        "Provided critical supply chain continuity to small breweries during COVID-19 disruption when large industry players dominated limited supply lines",
+        "Managed all plant functions concurrently including purchasing, logistics, quality assurance, people management and equipment maintenance",
       ],
     },
     {
