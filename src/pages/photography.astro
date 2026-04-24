@@ -91,25 +91,27 @@ function full(path: string) {
 
 <style>
   .photo-list {
-    columns: 5;
-    column-gap: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
     width: 100%;
   }
 
   .photo-btn {
     display: block;
-    break-inside: avoid;
     background: none;
     border: none;
     padding: 0;
     cursor: zoom-in;
-    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
   }
 
   .photo-img {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
+    object-fit: cover;
     filter: brightness(0.88);
     transition: filter 300ms;
   }
@@ -121,7 +123,7 @@ function full(path: string) {
   .photo-caption { display: none; }
 
   @media (max-width: 520px) {
-    .photo-list { columns: 1; }
+    .photo-list { grid-template-columns: repeat(1, 1fr); }
   }
 
   #lightbox {
