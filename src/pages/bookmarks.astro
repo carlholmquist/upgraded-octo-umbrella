@@ -13,7 +13,7 @@ const links = siteConfig.Bookmarks.flatMap((cat) => cat.links ?? []);
     <button type="submit" class="search-btn" aria-label="Search">↵</button>
   </form>
 
-  <nav class="link-list" style={`height: ${Math.ceil(links.length / 3) * 28}px`}>
+  <nav class="link-list">
     {links.map((link, i) => (
       <a href={link.url} target="_blank" rel="noopener noreferrer" class="nav-link">
         <span class="nav-index">{String(i + 1).padStart(3, '0')}</span>
@@ -79,6 +79,16 @@ const links = siteConfig.Bookmarks.flatMap((cat) => cat.links ?? []);
 
 <script>
   const input = document.getElementById("search") as HTMLInputElement;
+  const list = document.querySelector(".link-list") as HTMLElement;
+
+  function updateHeight() {
+    const cols = window.innerWidth <= 520 ? 2 : 3;
+    const total = list.querySelectorAll(".nav-link:not([style*='none'])").length;
+    list.style.height = `${Math.ceil(total / cols) * 28}px`;
+  }
+
+  updateHeight();
+  window.addEventListener("resize", updateHeight);
 
   input.addEventListener("input", () => {
     const q = input.value.toLowerCase().trim();
@@ -86,5 +96,6 @@ const links = siteConfig.Bookmarks.flatMap((cat) => cat.links ?? []);
       const label = link.querySelector(".nav-label")?.textContent?.toLowerCase() ?? "";
       link.style.display = !q || label.includes(q) ? "" : "none";
     });
+    updateHeight();
   });
 </script>
