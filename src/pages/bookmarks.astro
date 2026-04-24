@@ -1,0 +1,94 @@
+---
+import DarkLayout from "../layouts/DarkLayout.astro";
+import { siteConfig } from "../config";
+
+const categories = siteConfig.Bookmarks;
+---
+
+<DarkLayout title="Bookmarks — Carl Holmquist" back pageLabel="Bookmarks">
+  <span slot="footer-left">holmquist.studio</span>
+
+  <form action="https://www.google.com/search" method="get" class="search-form">
+    <input type="text" name="q" placeholder="search_" autocomplete="off" class="search-input" />
+    <button type="submit" class="search-btn" aria-label="Search">↵</button>
+  </form>
+
+  <div class="categories">
+    {categories.map((cat) => (
+      <section class="category">
+        <h2 class="section-label">{cat.catname}</h2>
+        <nav class="link-list">
+          {cat.links?.map((link, i) => (
+            <a href={link.url} target="_blank" rel="noopener noreferrer" class="nav-link">
+              <span class="nav-index">{String(i + 1).padStart(3, '0')}</span>
+              <span class="nav-label">{link.label}</span>
+            </a>
+          ))}
+        </nav>
+      </section>
+    ))}
+  </div>
+</DarkLayout>
+
+<style>
+  .search-form {
+    display: flex;
+    align-items: center;
+    margin-bottom: 56px;
+    border-bottom: 1px solid rgba(226, 230, 232, 0.15);
+    padding-bottom: 2px;
+  }
+
+  .search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 100%;
+    padding: 8px 0;
+    letter-spacing: 0.05em;
+  }
+
+  .search-input::placeholder {
+    color: var(--text-dim);
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.15; }
+  }
+
+  .search-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 100%;
+    cursor: pointer;
+    padding: 8px 0 8px 12px;
+    transition: color 300ms;
+  }
+  .search-btn:hover { color: var(--text); }
+
+  .categories {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  .category {}
+
+  .link-list {
+    columns: 3;
+    column-gap: 32px;
+    column-fill: auto;
+    height: 112px; /* 4 rows × 28px */
+  }
+
+  @media (max-width: 520px) {
+    .link-list { columns: 2; height: 168px; }
+  }
+</style>

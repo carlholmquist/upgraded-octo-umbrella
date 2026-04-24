@@ -16,7 +16,7 @@ import "../styles/global.css";
     />
     <title>Ghost — Privacy Policy</title>
   </head>
-  <body class="bg-white text-gray-800 min-h-screen">
+  <body class="text-gray-800">
     <div class="mx-auto max-w-3xl px-6 py-16 lg:px-8">
 
       <header class="mb-12">
@@ -110,5 +110,12 @@ import "../styles/global.css";
 
       </div>
     </div>
+    <script>
+      window.addEventListener('scroll', () => {
+        const max = document.body.scrollHeight - window.innerHeight;
+        if (max <= 0) return;
+        document.body.style.backgroundPosition = `0% ${(window.scrollY / max) * 100}%`;
+      }, { passive: true });
+    </script>
   </body>
 </html>

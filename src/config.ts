@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "Carl Holmquist",
-  title: "Engineer | MSc Building Design | Houston, Texas",
+  title: "Hej",
   description:
     "Portfolio and professional profile of Carl Holmquist — Engineer, MSc Building Design, Based in Houston, Texas.",
   accentColor: "#409c44",
@@ -10,6 +10,7 @@ export const siteConfig = {
     twitter: "",
     github: "https://github.com/carlholmquist",
   },
+  info: "I am Carl Holmquist. Engineer, builder, and photographer based in Houston, Texas. Interested in structures, tools, and making things work. Originally from Sweden",
   aboutMe:
     "Engineer with a broad technical background spanning structural materials research, manufacturing operations, and hands-on construction. I hold an MSc in Engineering, Building Design from Luleå University of Technology and am currently pursuing FE Civil licensure as I transition into building engineering in Southern California.\n\nMy career has given me an unusually wide perspective — leading production operations with full budget responsibility in the millions, managing multidisciplinary teams, and delivering complex technical projects from planning through execution. Along the way I have developed a genuine enthusiasm for computational problem solving, applying programming and data tools to real engineering and operational challenges.\n\nThis breadth is grounded in technical depth, including structural materials research conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products for my MSc thesis.\n\nI'm drawn to technical work that combines engineering depth with real-world complexity. Long term I'm building toward founding my own engineering practice.",
   skills: [
@@ -85,4 +86,60 @@ export const siteConfig = {
       ],
     },
   ],
-};
+  Bookmarks: [
+      {
+        catname: "Engineering",
+        links: [
+          {
+            label: "NCEES",
+            url: "https://account.ncees.org/login",
+          },
+          {
+            label: "SkyCiv",
+            url: "https://platform.skyciv.com/login"
+          },
+          {
+            label: "CalcForge",
+            url: "https://calcforge.com",
+          },
+          {
+            label: "Resources for FE",
+            url: "https://journey2pe.com/the-ultimate-free-resource-guide-to-passing-the-fe-exam/",
+          },
+        ],
+      },
+      {
+        catname: "Web Apps",
+        links: [
+          {
+            label: "Strudel",
+            url: "https://strudel.cc",
+          },
+          {
+            label: "Claude",
+            url: "https://claude.ai",
+          },
+          {
+            label: "ARC FLUIDS",
+            url: "https://prosperousuniverse.com/auth/login?od=https://apex.prosperousuniverse.com/#/cards/c339a71756d1f504ac9cea23444aa725",
+          },
+        ],
+      },{
+        catname: "Socials",
+        links: [
+          {
+            label: "Instagram",
+            url: "https://instagram.com",
+          },
+          {
+            label: "Facebook",
+            url: "https://facebook.com",
+          },
+          {
+            label: "reddit",
+            url: "https://reddit.com",
+          },
+        ],
+      },
+    ],
+}

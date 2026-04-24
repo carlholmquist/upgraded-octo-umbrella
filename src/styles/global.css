@@ -2,4 +2,8 @@
 
 body {
   font-family: 'IBM Plex Mono', monospace;
+  /* background: linear-gradient(180deg, #bbf7d0 0%, #e0f2fe 50%, #e9d5ff 100%); */
+  background-size: 100% 200%;
+  background-position: 0% 0%;
+  min-height: 100vh;
 }
