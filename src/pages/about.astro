@@ -118,6 +118,16 @@ const aboutParagraphs = siteConfig.aboutMe.split("\n\n").filter(Boolean);
 
   .entries { display: flex; flex-direction: column; gap: 36px; }
 
+  .entry .entry-index {
+    opacity: 0.25;
+    transition: opacity 300ms;
+  }
+  .entry:hover .entry-index { opacity: 0.85; }
+
+  @media (hover: none) {
+    .entry.in-view .entry-index { opacity: 0.85; }
+  }
+
   .entry-head {
     display: flex;
     flex-wrap: wrap;
@@ -162,12 +172,6 @@ const aboutParagraphs = siteConfig.aboutMe.split("\n\n").filter(Boolean);
     transition: opacity 275ms;
   }
 
-  .entry:hover .entry-index { opacity: 0.85; }
-
-  @media (hover: none) {
-    .entry.in-view .entry-index { opacity: 0.85; }
-  }
-
   .entry-title { font-size: 100%; font-weight: 400; color: var(--text); }
 
   .entry-title.link {
@@ -184,11 +188,11 @@ const aboutParagraphs = siteConfig.aboutMe.split("\n\n").filter(Boolean);
 
   .entry-body { color: var(--text); }
 
-  .bullet-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .bullet-list { list-style: none; display: flex; flex-direction: column; gap: 6px; padding: 0; margin: 0; }
 
   .bullet-list li {
     color: var(--text);
-    padding-left: 16px;
+    padding-left: 33px;
     position: relative;
   }
 
@@ -200,16 +204,3 @@ const aboutParagraphs = siteConfig.aboutMe.split("\n\n").filter(Boolean);
   }
 </style>
 
-<script>
-  if (window.matchMedia("(hover: none)").matches) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          entry.target.classList.toggle("in-view", entry.isIntersecting);
-        });
-      },
-      { threshold: 0.6 }
-    );
-    document.querySelectorAll(".entry").forEach((el) => observer.observe(el));
-  }
-</script>

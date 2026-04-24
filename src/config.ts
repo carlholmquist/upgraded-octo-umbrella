@@ -88,6 +88,15 @@ export const siteConfig = {
   ],
   Bookmarks: [
       {
+        catname: "News",
+        links: [
+          {
+            label: "DN",
+            url: "https://dn.se",
+          },
+        ],
+      },
+      {
         catname: "Engineering",
         links: [
           {
@@ -138,6 +147,74 @@ export const siteConfig = {
           {
             label: "reddit",
             url: "https://reddit.com",
+          },
+        ],
+      },{
+        catname: "Google",
+        links: [
+          {
+            label: "Sheets",
+            url: "https://docs.google.com/spreadsheets/u/1/",
+          },
+          {
+            label: "Maps",
+            url: "https://www.google.com/maps",
+          },
+          {
+            label: "Youtube",
+            url: "https://youtube.com",
+          },
+          {
+            label: "Translate",
+            url: "https://www.google.com/search?client=safari&rls=en&q=translate&ie=UTF-8&oe=UTF-8",
+          },
+        ],
+      },{
+        catname: "Services",
+        links: [
+          {
+            label: "Peacock",
+            url: "https://www.peacocktv.com/watch/home",
+          },
+          {
+            label: "Disney",
+            url: "https://www.disneyplus.com/home",
+          },
+          {
+            label: "Strava",
+            url: "https://www.strava.com/dashboard",
+          },
+          {
+            label: "Hulu",
+            url: "https://www.hulu.com/hub/home",
+          },
+          {
+            label: "Youtube",
+            url: "https://youtube.com",
+          },
+        ],
+      },{
+        catname: "Developer",
+        links: [
+          {
+            label: "github",
+            url: "https://www.github.com",
+          },
+          {
+            label: "Cloudinary",
+            url: "https://console.cloudinary.com/",
+          },
+          {
+            label: "holmquist.studio",
+            url: "https://www.holmquist.studio",
+          },
+          {
+            label: "Hulu",
+            url: "https://www.hulu.com/hub/home",
+          },
+          {
+            label: "Youtube",
+            url: "https://youtube.com",
           },
         ],
       },
