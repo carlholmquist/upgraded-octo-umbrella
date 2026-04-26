@@ -1,0 +1,137 @@
+---
+import DarkLayout from "../layouts/DarkLayout.astro";
+
+const project = {
+  title: "Project Name",
+  year: "2025",
+  role: "Design & Development",
+  stack: ["Astro", "TypeScript", "Cloudinary"],
+  liveUrl: "https://example.com",
+  sourceUrl: "https://github.com/carlholmquist/project",
+  overview: `A short paragraph introducing the project. What it is, why it exists, and what problem it solves. Keep it concise — two or three sentences is usually enough to set the stage.`,
+  sections: [
+    {
+      label: "Context",
+      body: `More detail about the background. What was the starting point? Who is it for? What constraints shaped the decisions made along the way?`,
+    },
+    {
+      label: "Approach",
+      body: `How did you tackle it? What tradeoffs were considered? What ended up being the interesting or hard parts of the problem?`,
+    },
+    {
+      label: "Outcome",
+      body: `What did you ship? What changed, improved, or was learned? Include any metrics or results if relevant.`,
+    },
+  ],
+  images: [
+     { src: "https://res.cloudinary.com/drey6ump8/image/upload/q_auto,f_auto,w_1400/...", alt: "Screenshot caption" },
+  ],
+};
+---
+
+<DarkLayout title={`${project.title} — Carl Holmquist`} back pageLabel={project.title}>
+  <span slot="footer-left">holmquist.studio</span>
+  <span slot="footer-right">{project.year}</span>
+
+  <!-- Meta row -->
+  <div class="meta-row">
+    <span class="meta-item">{project.role}</span>
+    <span class="meta-sep">·</span>
+    <span class="meta-item">{project.stack.join(", ")}</span>
+    {project.liveUrl && (
+      <>
+        <span class="meta-sep">·</span>
+        <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" class="meta-link dark-link">Live ↗</a>
+      </>
+    )}
+    {project.sourceUrl && (
+      <>
+        <span class="meta-sep">·</span>
+        <a href={project.sourceUrl} target="_blank" rel="noopener noreferrer" class="meta-link dark-link">Source ↗</a>
+      </>
+    )}
+  </div>
+
+  <!-- Overview -->
+  <section class="section">
+    <h2 class="section-label">Overview</h2>
+    <div class="prose">
+      <p>{project.overview}</p>
+    </div>
+  </section>
+
+  <!-- Images -->
+  {project.images.length > 0 && (
+    <div class="image-strip">
+      {project.images.map((img) => (
+        <figure class="image-figure">
+          <img src={img.src} alt={img.alt ?? ""} class="project-img" loading="lazy" />
+          {img.alt && <figcaption class="image-caption">{img.alt}</figcaption>}
+        </figure>
+      ))}
+    </div>
+  )}
+
+  <!-- Detail sections -->
+  {project.sections.map((sec) => (
+    <section class="section">
+      <h2 class="section-label">{sec.label}</h2>
+      <div class="prose">
+        <p>{sec.body}</p>
+      </div>
+    </section>
+  ))}
+</DarkLayout>
+
+<style>
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 48px;
+    color: var(--text-dim);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+
+  .meta-sep { opacity: 0.4; }
+
+  .meta-item { color: var(--text-dim); }
+
+  .meta-link { font-size: 11px; letter-spacing: 0.08em; }
+
+  .section { margin-bottom: 48px; }
+
+  .prose {
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .image-strip {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 48px;
+  }
+
+  .image-figure { margin: 0; }
+
+  .project-img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    filter: brightness(0.9);
+    transition: filter 300ms;
+  }
+  .project-img:hover { filter: brightness(1); }
+
+  .image-caption {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+</style>

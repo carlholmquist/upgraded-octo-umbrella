@@ -260,12 +260,15 @@ const {
   :global(.back-link .char.cursor), :global(.header-left .char.cursor), :global(.header-right .char.cursor),
   :global(.footer-left .char.cursor), :global(.footer-right .char.cursor) { background: var(--text); color: var(--bg); }
 
-  /* Shared char styles for entry and section sweeps */
-  :global(.entry .char), :global(.prose .char), :global(.section > .skills .char) {
+  /* Shared char styles for entry, section, and info sweeps */
+  :global(.entry .char), :global(.prose .char), :global(.section > .skills .char),
+  :global(.info-title .char), :global(.info-bio .char) {
     color: var(--text-dim); transition: color 60ms; display: inline;
   }
-  :global(.entry .char.lit), :global(.prose .char.lit), :global(.section > .skills .char.lit) { color: var(--text); }
-  :global(.entry .char.cursor), :global(.prose .char.cursor), :global(.section > .skills .char.cursor) { background: var(--text); color: var(--bg); }
+  :global(.entry .char.lit), :global(.prose .char.lit), :global(.section > .skills .char.lit),
+  :global(.info-title .char.lit), :global(.info-bio .char.lit) { color: var(--text); }
+  :global(.entry .char.cursor), :global(.prose .char.cursor), :global(.section > .skills .char.cursor),
+  :global(.info-title .char.cursor), :global(.info-bio .char.cursor) { background: var(--text); color: var(--bg); }
 
 </style>
 
@@ -332,67 +335,95 @@ const {
     });
   }
 
-  function initEntries() {
-    const isMobile = window.matchMedia("(hover: none)").matches;
+  function initScrollSweep() {
+    // Split chars for all sweepable content
     document.querySelectorAll(".entry").forEach(entry => {
-      if (entry.dataset.cursor) return;
-      entry.dataset.cursor = "1";
-
       entry.querySelectorAll(".entry-title, .entry-meta, .entry-date, .entry-body, .skill").forEach(splitChars);
       entry.querySelectorAll(".bullet-list li").forEach(li => {
         if (li.dataset.split) return;
         li.dataset.split = "1";
-        const text = li.textContent ?? "";
-        li.innerHTML = [...text]
-          .map((ch) => `<span class="char">${ch}</span>`)
-          .join("");
+        li.innerHTML = [...(li.textContent ?? "")].map(ch => `<span class="char">${ch}</span>`).join("");
+      });
+    });
+    document.querySelectorAll(".section").forEach(section => {
+      if (!section.querySelector(".prose")) return;
+      section.querySelectorAll(".prose p, :scope > .skills .skill").forEach(splitChars);
+    });
+    document.querySelectorAll(".info-title, .info-bio").forEach(splitChars);
+
+    const rowTimers = new Map();
+
+    function sweepRow(key, chars) {
+      (rowTimers.get(key) ?? []).forEach(clearTimeout);
+      const timers = [];
+      rowTimers.set(key, timers);
+      const msPerChar = Math.min(30, Math.max(7.5, 300 / Math.max(chars.length, 1)));
+      chars.forEach((char, i) => {
+        const t = i * msPerChar;
+        timers.push(setTimeout(() => { char.classList.add("cursor"); char.classList.remove("lit"); }, t));
+        timers.push(setTimeout(() => { char.classList.remove("cursor"); char.classList.add("lit"); }, t + 60));
+      });
+    }
+
+    function resetRow(key, chars) {
+      (rowTimers.get(key) ?? []).forEach(clearTimeout);
+      rowTimers.delete(key);
+      chars.forEach(c => c.classList.remove("lit", "cursor"));
+    }
+
+    const inViewRows = new Set();
+    let rafPending = false;
+
+    function checkRows() {
+      const vh = window.innerHeight;
+      const allChars = Array.from(document.querySelectorAll(
+        ".entry .char, .prose .char, .section > .skills .char, .info-title .char, .info-bio .char"
+      ));
+
+      const rowMap = new Map();
+      allChars.forEach(char => {
+        const rect = char.getBoundingClientRect();
+        const docY = Math.round((rect.top + window.scrollY) / 2) * 2;
+        if (!rowMap.has(docY)) rowMap.set(docY, []);
+        rowMap.get(docY).push(char);
       });
 
-      function allChars() {
-        return Array.from(entry.querySelectorAll(".char"));
-      }
+      const style = getComputedStyle(document.documentElement);
+      const headerH = parseInt(style.getPropertyValue("--header-h")) || 60;
+      const footerH = parseInt(style.getPropertyValue("--footer-h")) || 50;
 
-      if (!isMobile) {
-        entry.addEventListener("mouseenter", () => sweepRows(entry, allChars()));
-        entry.addEventListener("mouseleave", () => resetChars(entry));
-      } else {
-        const obs = new IntersectionObserver(([e]) => {
-          entry.classList.toggle("in-view", e.isIntersecting);
-          if (e.isIntersecting) sweepRows(entry, allChars());
-          else resetChars(entry);
-        }, { threshold: 0.5 });
-        obs.observe(entry);
-      }
-    });
-  }
+      const nowInView = new Set();
+      rowMap.forEach((chars, docY) => {
+        const top = chars[0].getBoundingClientRect().top;
+        if (top >= headerH && top < vh - footerH) nowInView.add(docY);
+      });
 
-  function initSections() {
-    const isMobile = window.matchMedia("(hover: none)").matches;
-    document.querySelectorAll(".section").forEach(section => {
-      if (section.dataset.cursor) return;
-      // Only handle sections that have prose content (e.g. About), not entry-list sections
-      if (!section.querySelector('.prose')) return;
+      nowInView.forEach(docY => {
+        if (!inViewRows.has(docY)) {
+          inViewRows.add(docY);
+          const chars = rowMap.get(docY);
+          setTimeout(() => sweepRow(docY, chars), 360);
+        }
+      });
 
-      section.dataset.cursor = "1";
+      inViewRows.forEach(docY => {
+        if (!nowInView.has(docY)) {
+          inViewRows.delete(docY);
+          const chars = rowMap.get(docY);
+          if (chars) resetRow(docY, chars);
+        }
+      });
+    }
 
-      section.querySelectorAll(".prose p, :scope > .skills .skill").forEach(splitChars);
+    function onScroll() {
+      if (rafPending) return;
+      rafPending = true;
+      requestAnimationFrame(() => { rafPending = false; checkRows(); });
+    }
 
-      function allChars() {
-        return Array.from(section.querySelectorAll(".prose .char, :scope > .skills .char"));
-      }
-
-      if (!isMobile) {
-        section.addEventListener("mouseenter", () => sweepRows(section, allChars()));
-        section.addEventListener("mouseleave", () => resetChars(section));
-      } else {
-        const obs = new IntersectionObserver(([e]) => {
-          section.classList.toggle("in-view", e.isIntersecting);
-          if (e.isIntersecting) sweepRows(section, allChars());
-          else resetChars(section);
-        }, { threshold: 0.3 });
-        obs.observe(section);
-      }
-    });
+    checkRows();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
   }
 
   function initHeaderFooter() {
@@ -417,7 +448,6 @@ const {
   }
 
   initNavLinks();
-  initEntries();
-  initSections();
+  initScrollSweep();
   initHeaderFooter();
 </script>
