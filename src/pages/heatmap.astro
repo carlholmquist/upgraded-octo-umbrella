@@ -7,6 +7,7 @@ import DarkLayout from "../layouts/DarkLayout.astro";
   <span slot="footer-left">holmquist.studio</span>
 
   <div id="map"></div>
+  <button id="map-toggle" aria-label="Toggle satellite view">satellite</button>
 </DarkLayout>
 
 <style>
@@ -22,9 +23,6 @@ import DarkLayout from "../layouts/DarkLayout.astro";
     font-size: 11px;
   }
 
-  :global(.leaflet-tile-pane) {
-    filter: grayscale(1) brightness(0.6) !important;
-  }
 
   :global(.leaflet-map-color-overlay) {
     position: absolute;
@@ -50,6 +48,27 @@ import DarkLayout from "../layouts/DarkLayout.astro";
   :global(.leaflet-control-zoom a:hover) {
     color: var(--text) !important;
   }
+
+  #map-toggle {
+    position: absolute;
+    bottom: calc(var(--footer-h) + 16px);
+    right: 16px;
+    z-index: 1000;
+    background: var(--bg);
+    color: var(--text-dim);
+    border: 1px solid var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: color 275ms, border-color 275ms;
+  }
+
+  #map-toggle:hover {
+    color: var(--text);
+    border-color: var(--text);
+  }
 </style>
 
 <script is:inline>
@@ -69,11 +88,22 @@ import DarkLayout from "../layouts/DarkLayout.astro";
       attributionControl: true,
     });
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+    const darkTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
       attribution: "© OpenStreetMap © CartoDB",
       subdomains: "abcd",
       maxZoom: 19,
-    }).addTo(map);
+    });
+
+    const satTiles = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+      attribution: "© Esri",
+      maxZoom: 19,
+    });
+
+    const satLabels = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {
+      maxZoom: 19,
+    });
+
+    darkTiles.addTo(map);
 
     // Color overlay — tints grayscale tiles to theme color
     const container = map.getContainer();
@@ -81,6 +111,29 @@ import DarkLayout from "../layouts/DarkLayout.astro";
     const colorOverlay = document.createElement("div");
     colorOverlay.className = "leaflet-map-color-overlay";
     container.appendChild(colorOverlay);
+
+    const tilePane = map.getPane("tilePane");
+    tilePane.style.filter = "grayscale(1) brightness(0.6)";
+    let isSatellite = false;
+
+    document.getElementById("map-toggle").addEventListener("click", () => {
+      isSatellite = !isSatellite;
+      if (isSatellite) {
+        map.removeLayer(darkTiles);
+        satTiles.addTo(map);
+        satLabels.addTo(map);
+        tilePane.style.filter = "none";
+        colorOverlay.style.display = "none";
+        document.getElementById("map-toggle").textContent = "styled";
+      } else {
+        map.removeLayer(satTiles);
+        map.removeLayer(satLabels);
+        darkTiles.addTo(map);
+        tilePane.style.filter = "grayscale(1) brightness(0.6)";
+        colorOverlay.style.display = "";
+        document.getElementById("map-toggle").textContent = "satellite";
+      }
+    });
 
     // Read theme color from CSS vars
     const style = getComputedStyle(document.documentElement);
