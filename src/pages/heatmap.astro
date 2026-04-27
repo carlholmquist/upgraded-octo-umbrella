@@ -1,0 +1,118 @@
+---
+import DarkLayout from "../layouts/DarkLayout.astro";
+---
+
+<DarkLayout title="Heatmap — Carl Holmquist" back pageLabel="Heatmap" fullBleed>
+  <link slot="head" rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <span slot="footer-left">holmquist.studio</span>
+
+  <div id="map"></div>
+</DarkLayout>
+
+<style>
+  #map {
+    width: 100%;
+    height: calc(100vh - var(--header-h) - var(--footer-h));
+  }
+
+  /* Hide Leaflet's default attribution box styling conflict */
+  :global(.leaflet-container) {
+    background: var(--bg) !important;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+  }
+
+  :global(.leaflet-tile-pane) {
+    filter: grayscale(1) brightness(0.6) !important;
+  }
+
+  :global(.leaflet-map-color-overlay) {
+    position: absolute;
+    inset: 0;
+    background: var(--text);
+    mix-blend-mode: color;
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 350;
+  }
+
+  :global(.leaflet-control-attribution) {
+    display: none;
+  }
+
+  :global(.leaflet-control-zoom a) {
+    background: var(--bg) !important;
+    color: var(--text-mid) !important;
+    border-color: var(--text-dim) !important;
+    font-family: 'IBM Plex Mono', monospace !important;
+  }
+
+  :global(.leaflet-control-zoom a:hover) {
+    color: var(--text) !important;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const leafletScript = document.createElement("script");
+    leafletScript.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    leafletScript.onload = initMap;
+    document.head.appendChild(leafletScript);
+  })();
+
+  async function initMap() {
+    const res = await fetch("https://studiobackend.onrender.com/geojson");
+    const geojson = await res.json();
+
+    const map = L.map("map", {
+      zoomControl: true,
+      attributionControl: true,
+    });
+
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      attribution: "© OpenStreetMap © CartoDB",
+      subdomains: "abcd",
+      maxZoom: 19,
+    }).addTo(map);
+
+    // Color overlay — tints grayscale tiles to theme color
+    const container = map.getContainer();
+    container.style.isolation = "isolate";
+    const colorOverlay = document.createElement("div");
+    colorOverlay.className = "leaflet-map-color-overlay";
+    container.appendChild(colorOverlay);
+
+    // Read theme color from CSS vars
+    const style = getComputedStyle(document.documentElement);
+    const themeText = style.getPropertyValue("--text").trim();
+
+    // Blurred glow pane
+    map.createPane("glowPane");
+    map.getPane("glowPane").style.filter = "blur(8px)";
+    map.createPane("corePane");
+
+    const glowRenderer = L.canvas({ pane: "glowPane" });
+    const coreRenderer = L.canvas({ pane: "corePane" });
+
+    const allLatLngs = [];
+
+    geojson.features.forEach((f) => {
+      if (f.geometry.type !== "LineString") return;
+      const latlngs = f.geometry.coordinates.map(([lng, lat]) => {
+        allLatLngs.push([lat, lng]);
+        return [lat, lng];
+      });
+
+      // Blurred glow in theme color
+      L.polyline(latlngs, { renderer: glowRenderer, color: themeText, weight: 16, opacity: 0.06, smoothFactor: 1 }).addTo(map);
+      L.polyline(latlngs, { renderer: glowRenderer, color: themeText, weight:  8, opacity: 0.12, smoothFactor: 1 }).addTo(map);
+
+      // Sharp core
+      L.polyline(latlngs, { renderer: coreRenderer, color: themeText, weight: 1.5, opacity: 0.35, smoothFactor: 1 }).addTo(map);
+    });
+
+    if (allLatLngs.length > 0) {
+      map.fitBounds(L.latLngBounds(allLatLngs), { padding: [40, 40] });
+    }
+  }
+</script>

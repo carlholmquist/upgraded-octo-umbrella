@@ -10,9 +10,9 @@ export const siteConfig = {
     twitter: "",
     github: "https://github.com/carlholmquist",
   },
-  info: "I am Carl Holmquist. Engineer, builder, and photographer based in Houston, Texas. Interested in structures, tools, and making things work. Originally from Sweden",
+  info: "I am Carl Holmquist. Engineer. Builder. Programmer. Photographer. In Houston, Texas. Interested in structures, tools, and making things work. Originally from Sweden",
   aboutMe:
-    "Engineer with a broad technical background spanning structural materials research, manufacturing operations, and hands-on construction. I hold an MSc in Engineering, Building Design from Luleå University of Technology and am currently pursuing FE Civil licensure as I transition into building engineering in Southern California.\n\nMy career has given me an unusually wide perspective — leading production operations with full budget responsibility in the millions, managing multidisciplinary teams, and delivering complex technical projects from planning through execution. Along the way I have developed a genuine enthusiasm for computational problem solving, applying programming and data tools to real engineering and operational challenges.\n\nThis breadth is grounded in technical depth, including structural materials research conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products for my MSc thesis.\n\nI'm drawn to technical work that combines engineering depth with real-world complexity. Long term I'm building toward founding my own engineering practice.",
+    "Engineer with a broad technical background spanning structural materials research, manufacturing operations, and hands-on construction. I hold an MSc in Engineering, Building Design from Luleå University of Technology and am currently transitioniong into building engineering in the US.\n\nMy career has given me an unusually wide perspective — leading production operations with full budget responsibility in the millions, managing multidisciplinary teams, and delivering complex technical projects from planning through execution. Along the way I have developed a genuine enthusiasm for computational problem solving, applying programming and data tools to real engineering and operational challenges.\n\nThis breadth is grounded in technical depth, including structural materials research conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products for my MSc thesis.\n\nI'm drawn to technical work that combines engineering depth with real-world complexity.",
   skills: [
     "Python",
     "Power BI",
@@ -58,7 +58,7 @@ export const siteConfig = {
       title: "Plant Manager",
       dateRange: "Nov 2020 – Jan 2023",
       bullets: [
-        "Built and operationalized company's first satellite production facility from the ground up, establishing workflows, staffing, and all operational functions",
+        "Helped built and operationalized company's first satellite production facility, establishing workflows, staffing, and all operational functions",
         "Scaled production to millions of labels per month serving large anchor clients and a growing craft brewery portfolio",
         "Provided critical supply chain continuity to small breweries during COVID-19 disruption when large industry players dominated limited supply lines",
         "Managed all plant functions concurrently including purchasing, logistics, quality assurance, people management and equipment maintenance",
@@ -211,6 +211,10 @@ export const siteConfig = {
           {
             label: "Hulu",
             url: "https://www.hulu.com/hub/home",
+          },
+          {
+            label: "Render",
+            url: "https://dashboard.render.com",
           },
           {
             label: "Youtube",

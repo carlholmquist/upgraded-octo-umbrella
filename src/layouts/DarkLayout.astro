@@ -38,6 +38,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
       rel="stylesheet"
     />
     <title>{title}</title>
+    <slot name="head" />
     <script is:inline define:vars={{ fixedThemeJson }}>
       const fixedTheme = JSON.parse(fixedThemeJson);
       const themes = [
