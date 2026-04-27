@@ -8,6 +8,7 @@ interface Props {
   centerMain?: boolean;
   showClock?: boolean;
   fullBleed?: boolean;
+  fixedTheme?: { bg: string; text: string };
 }
 
 const {
@@ -19,7 +20,10 @@ const {
   centerMain = false,
   showClock = false,
   fullBleed = false,
+  fixedTheme,
 } = Astro.props;
+
+const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
 ---
 
 <html lang="en">
@@ -34,7 +38,8 @@ const {
       rel="stylesheet"
     />
     <title>{title}</title>
-    <script is:inline>
+    <script is:inline define:vars={{ fixedThemeJson }}>
+      const fixedTheme = JSON.parse(fixedThemeJson);
       const themes = [
         { bg: "#0c1a12", text: "168, 230, 190" },
         { bg: "#16191b", text: "226, 230, 232" },
@@ -42,12 +47,38 @@ const {
         { bg: "#1a0e1f", text: "216, 180, 254" },
         { bg: "#1a0f08", text: "253, 186, 116" },
       ];
-      const t = themes[Math.floor(Math.random() * themes.length)];
-      document.documentElement.style.setProperty("--bg", t.bg);
-      document.documentElement.style.setProperty("--text", `rgb(${t.text})`);
-      document.documentElement.style.setProperty("--text-dim", `rgba(${t.text}, 0.35)`);
-      document.documentElement.style.setProperty("--text-mid", `rgba(${t.text}, 0.65)`);
-      document.documentElement.style.background = t.bg;
+      function applyVars(bg, text) {
+        document.documentElement.style.setProperty("--bg", bg);
+        document.documentElement.style.setProperty("--text", `rgb(${text})`);
+        document.documentElement.style.setProperty("--text-dim", `rgba(${text}, 0.35)`);
+        document.documentElement.style.setProperty("--text-mid", `rgba(${text}, 0.65)`);
+      }
+      const prevBg = sessionStorage.getItem("prev-bg");
+      let currentBg, currentText;
+      if (fixedTheme) {
+        currentBg = fixedTheme.bg;
+        currentText = fixedTheme.text;
+      } else {
+        const prevIdx = sessionStorage.getItem("theme-idx");
+        let idx;
+        do { idx = Math.floor(Math.random() * themes.length); }
+        while (themes.length > 1 && String(idx) === prevIdx);
+        sessionStorage.setItem("theme-idx", String(idx));
+        currentBg = themes[idx].bg;
+        currentText = themes[idx].text;
+      }
+      sessionStorage.setItem("prev-bg", currentBg);
+      applyVars(currentBg, currentText);
+      if (prevBg && prevBg !== currentBg) {
+        const overlay = document.createElement("div");
+        overlay.style.cssText = "position:fixed;inset:0;z-index:9999;pointer-events:none;background:" + prevBg;
+        document.documentElement.appendChild(overlay);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          overlay.style.transition = "opacity 800ms ease";
+          overlay.style.opacity = "0";
+          setTimeout(() => overlay.remove(), 850);
+        }));
+      }
     </script>
   </head>
   <body>
@@ -107,6 +138,11 @@ const {
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  @keyframes page-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
   body {
     background: var(--bg);
     color: var(--text);
@@ -114,6 +150,7 @@ const {
     font-size: 13px;
     line-height: 1.75;
     min-height: 100vh;
+    animation: page-fade-in 650ms ease both;
   }
 
   #site-header {
@@ -450,4 +487,15 @@ const {
   initNavLinks();
   initScrollSweep();
   initHeaderFooter();
+
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest("a[href]");
+    if (!link || link.target === "_blank" || !link.href) return;
+    const href = link.getAttribute("href");
+    if (!href || href.startsWith("mailto:") || href.startsWith("http") || href.startsWith("#")) return;
+    e.preventDefault();
+    document.body.style.transition = "opacity 400ms ease";
+    document.body.style.opacity = "0";
+    setTimeout(() => { window.location.href = href; }, 410);
+  });
 </script>
