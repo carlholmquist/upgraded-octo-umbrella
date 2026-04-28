@@ -10,7 +10,7 @@ export const siteConfig = {
     twitter: "",
     github: "https://github.com/carlholmquist",
   },
-  info: "I am Carl Holmquist. Engineer. Builder. Programmer. Photographer. In Houston, Texas. Interested in structures, tools, and making things work. Originally from Sweden",
+  info: "I am Carl Holmquist. Engineer. Enjoy building stuff and taking photos. Interested in structures, tools, and making things work. In Houston TX, from Sweden",
   aboutMe:
     "Engineer with a broad technical background spanning structural materials research, manufacturing operations, and hands-on construction. I hold an MSc in Engineering, Building Design from Luleå University of Technology and am currently transitioniong into building engineering in the US.\n\nMy career has given me an unusually wide perspective — leading production operations with full budget responsibility in the millions, managing multidisciplinary teams, and delivering complex technical projects from planning through execution. Along the way I have developed a genuine enthusiasm for computational problem solving, applying programming and data tools to real engineering and operational challenges.\n\nThis breadth is grounded in technical depth, including structural materials research conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products for my MSc thesis.\n\nI'm drawn to technical work that combines engineering depth with real-world complexity.",
   skills: [
@@ -49,7 +49,7 @@ export const siteConfig = {
         "Held full budget responsibility for about $6 million, covering fixed and variable costs",
         "Served on executive team contributing to strategy, policy, and financial decisions",
         "Delivered installation of a large-scale industrial heat exchanger system",
-        "Coordinated consulting engineers, contractors, pipe fitters, accredited inspectors, and suppliers",
+        "Coordinated consulting engineers, contractors, accredited inspectors, and suppliers",
         "Managed project within technical and budgetary constraints from planning through commissioning",
       ],
     },
