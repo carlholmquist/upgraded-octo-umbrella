@@ -6,11 +6,47 @@ import DarkLayout from "../layouts/DarkLayout.astro";
   <link slot="head" rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <span slot="footer-left">holmquist.studio</span>
 
+  <div id="map-loader"><span id="loader-text">loading</span></div>
   <div id="map"></div>
   <button id="map-toggle" aria-label="Toggle satellite view">satellite</button>
 </DarkLayout>
 
 <style>
+  #map-loader {
+    position: absolute;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: opacity 400ms ease 300ms;
+  }
+
+  #map-loader.done {
+    opacity: 0;
+  }
+
+  #loader-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+  }
+
+  :global(#loader-text .char) {
+    color: var(--text-dim);
+    transition: color 60ms;
+    display: inline;
+  }
+
+  :global(#loader-text .char.lit) { color: var(--text); }
+
+  :global(#loader-text .char.cursor) {
+    background: var(--text);
+    color: var(--bg);
+  }
+
   #map {
     width: 100%;
     height: calc(100vh - var(--header-h) - var(--footer-h));
@@ -80,6 +116,30 @@ import DarkLayout from "../layouts/DarkLayout.astro";
   })();
 
   async function initMap() {
+    const loader = document.getElementById("map-loader");
+    const loaderText = document.getElementById("loader-text");
+    loaderText.innerHTML = [...loaderText.textContent].map(ch => `<span class="char">${ch}</span>`).join("");
+    const chars = Array.from(loaderText.querySelectorAll(".char"));
+    let loaderTimers = [];
+    let looping = true;
+
+    function runLoaderSweep() {
+      if (!looping) return;
+      loaderTimers.forEach(clearTimeout);
+      loaderTimers = [];
+      chars.forEach(c => c.classList.remove("lit", "cursor"));
+      const msPerChar = 80;
+      chars.forEach((char, i) => {
+        loaderTimers.push(setTimeout(() => { char.classList.add("cursor"); char.classList.remove("lit"); }, i * msPerChar));
+        loaderTimers.push(setTimeout(() => { char.classList.remove("cursor"); char.classList.add("lit"); }, i * msPerChar + 60));
+      });
+      loaderTimers.push(setTimeout(() => {
+        chars.forEach(c => c.classList.remove("lit", "cursor"));
+        loaderTimers.push(setTimeout(runLoaderSweep, 200));
+      }, chars.length * msPerChar + 200));
+    }
+    runLoaderSweep();
+
     const res = await fetch("https://studiobackend.onrender.com/geojson");
     const geojson = await res.json();
 
@@ -167,5 +227,9 @@ import DarkLayout from "../layouts/DarkLayout.astro";
     if (allLatLngs.length > 0) {
       map.fitBounds(L.latLngBounds(allLatLngs), { padding: [40, 40] });
     }
+
+    looping = false;
+    loaderTimers.forEach(clearTimeout);
+    loader.classList.add("done");
   }
 </script>
