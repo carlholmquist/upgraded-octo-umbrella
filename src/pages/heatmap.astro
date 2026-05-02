@@ -224,7 +224,13 @@ import DarkLayout from "../layouts/DarkLayout.astro";
       L.polyline(latlngs, { renderer: coreRenderer, color: themeText, weight: 1.5, opacity: 0.35, smoothFactor: 1 }).addTo(map);
     });
 
-    if (allLatLngs.length > 0) {
+    // Center on the last route's midpoint
+    const lastFeature = [...geojson.features].reverse().find((f) => f.geometry.type === "LineString");
+    if (lastFeature) {
+      const coords = lastFeature.geometry.coordinates;
+      const mid = coords[Math.floor(coords.length / 2)];
+      map.setView([mid[1], mid[0]], 13);
+    } else if (allLatLngs.length > 0) {
       map.fitBounds(L.latLngBounds(allLatLngs), { padding: [40, 40] });
     }
 

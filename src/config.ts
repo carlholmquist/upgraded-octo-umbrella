@@ -220,6 +220,18 @@ export const siteConfig = {
             label: "Youtube",
             url: "https://youtube.com",
           },
+          {
+            label: "Cloudflare Dashboard",
+            url: "https://dash.cloudflare.com/",
+          },
+          {
+            label: "Brave API Dashboard",
+            url: "https://api-dashboard.search.brave.com/app/dashboard",
+          },
+          {
+            label: "Cloudflare",
+            url: "https://dash.cloudflare.com/",
+          }
         ],
       },
     ],

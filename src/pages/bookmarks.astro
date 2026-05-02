@@ -8,10 +8,13 @@ const links = siteConfig.Bookmarks.flatMap((cat) => cat.links ?? []);
 <DarkLayout title="Bookmarks — Carl Holmquist" back pageLabel="Bookmarks">
   <span slot="footer-left">holmquist.studio</span>
 
-  <form action="https://www.google.com/search" method="get" class="search-form">
+  <form id="search-form" class="search-form">
     <input type="text" name="q" id="search" placeholder="search_" autocomplete="off" class="search-input" />
+    <button type="button" id="search-clear" class="search-clear" aria-label="Clear" style="visibility:hidden">×</button>
     <button type="submit" class="search-btn" aria-label="Search">↵</button>
   </form>
+
+  <div id="search-results" class="search-results" style="display:none"></div>
 
   <nav class="link-list">
     {links.map((link, i) => (
@@ -54,6 +57,19 @@ const links = siteConfig.Bookmarks.flatMap((cat) => cat.links ?? []);
     50% { opacity: 0.15; }
   }
 
+  .search-clear {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px 4px 8px 12px;
+    transition: color 300ms;
+    line-height: 1;
+  }
+  .search-clear:hover { color: var(--text); }
+
   .search-btn {
     background: transparent;
     border: none;
@@ -75,11 +91,62 @@ const links = siteConfig.Bookmarks.flatMap((cat) => cat.links ?? []);
   @media (max-width: 520px) {
     .link-list { columns: 2; }
   }
+
+  .search-results {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .results-status {
+    color: var(--text-dim);
+    font-size: 100%;
+    letter-spacing: 0.08em;
+  }
+
+  :global(.result-item) {
+    display: block;
+    text-decoration: none;
+    color: var(--text);
+    padding: 14px 0;
+    border-bottom: 1px solid var(--text-dim);
+    transition: color 275ms;
+  }
+  :global(.result-item:first-child) { border-top: 1px solid var(--text-dim); }
+
+  :global(.result-head) {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  :global(.result-domain) {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  :global(.result-desc) {
+    color: var(--text-dim);
+    font-size: 100%;
+    font-weight: 300;
+    padding-left: 38px;
+    line-height: 1.6;
+  }
+
+  :global(.result-item .char) { color: var(--text-dim); transition: color 60ms; display: inline; }
+  :global(.result-item .char.lit) { color: var(--text); }
+  :global(.result-item .char.cursor) { background: var(--text); color: var(--bg); }
 </style>
 
 <script>
   const input = document.getElementById("search") as HTMLInputElement;
   const list = document.querySelector(".link-list") as HTMLElement;
+  const form = document.getElementById("search-form") as HTMLFormElement;
+  const results = document.getElementById("search-results") as HTMLElement;
+  const clearBtn = document.getElementById("search-clear") as HTMLButtonElement;
 
   function updateHeight() {
     const cols = window.innerWidth <= 520 ? 2 : 3;
@@ -90,12 +157,102 @@ const links = siteConfig.Bookmarks.flatMap((cat) => cat.links ?? []);
   updateHeight();
   window.addEventListener("resize", updateHeight);
 
+  function clearSearch() {
+    input.value = "";
+    clearBtn.style.visibility = "hidden";
+    results.style.display = "none";
+    results.innerHTML = "";
+    list.style.display = "";
+    document.querySelectorAll<HTMLElement>(".nav-link").forEach(l => l.style.display = "");
+    updateHeight();
+    input.focus();
+  }
+
+  clearBtn.addEventListener("click", clearSearch);
+
   input.addEventListener("input", () => {
     const q = input.value.toLowerCase().trim();
+    clearBtn.style.visibility = q ? "visible" : "hidden";
+    if (!q) {
+      results.style.display = "none";
+      results.innerHTML = "";
+      list.style.display = "";
+      updateHeight();
+    }
     document.querySelectorAll<HTMLElement>(".nav-link").forEach((link) => {
       const label = link.querySelector(".nav-label")?.textContent?.toLowerCase() ?? "";
       link.style.display = !q || label.includes(q) ? "" : "none";
     });
     updateHeight();
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q) return;
+
+    list.style.display = "none";
+    results.style.display = "block";
+    results.innerHTML = `<p class="results-status">searching_</p>`;
+
+    try {
+      const res = await fetch("https://winter-dream-e43b.holmquist-carl.workers.dev/?q=" + encodeURIComponent(q), {
+        headers: { "Accept": "application/json" },
+      });
+      const data = await res.json();
+      const items = data?.web?.results ?? [];
+
+      if (items.length === 0) {
+        results.innerHTML = `<p class="results-status">no results</p>`;
+        return;
+      }
+
+      results.innerHTML = items.map((item: any, i: number) => {
+        const domain = new URL(item.url).hostname.replace(/^www\./, "");
+        return `
+          <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="result-item">
+            <div class="result-head">
+              <span class="nav-index">${String(i + 1).padStart(3, "0")}</span>
+              <span class="nav-label">${item.title}</span>
+              <span class="result-domain">${domain}</span>
+            </div>
+            ${item.description ? `<p class="result-desc">${item.description}</p>` : ""}
+          </a>
+        `;
+      }).join("");
+    } catch {
+      results.innerHTML = `<p class="results-status">error fetching results</p>`;
+    }
+
+    // Init sweep on rendered result items
+    const sw = (window as any).sweepRows;
+    const rc = (window as any).resetChars;
+    if (sw && rc) {
+      document.querySelectorAll(".result-item").forEach((item) => {
+        item.querySelectorAll(".nav-label, .result-domain, .result-desc").forEach((el: any) => {
+          if (el.dataset.split) return;
+          el.dataset.split = "1";
+          el.innerHTML = [...(el.textContent ?? "")].map((ch: string) => `<span class="char">${ch}</span>`).join("");
+        });
+        const titleChars = () => Array.from(item.querySelectorAll(".nav-label .char"));
+        const descChars = () => Array.from(item.querySelectorAll(".result-desc .char, .result-domain .char"));
+        const allChars = () => Array.from(item.querySelectorAll(".char"));
+        const isMobile = window.matchMedia("(hover: none)").matches;
+        const descEl = item.querySelector(".result-desc") || item;
+
+        // Title sweeps on scroll (use item as timer target)
+        const obs = new IntersectionObserver(([e]) => {
+          if (e.isIntersecting) sw(item, isMobile ? allChars() : titleChars());
+          else titleChars().forEach((c: any) => c.classList.remove("lit", "cursor"));
+        }, { threshold: 0.3 });
+        obs.observe(item);
+
+        // Desc sweeps on hover (use descEl as separate timer target to avoid cancelling title)
+        if (!isMobile) {
+          item.addEventListener("mouseenter", () => sw(descEl, descChars()));
+          item.addEventListener("mouseleave", () => rc(descEl));
+        }
+      });
+    }
   });
 </script>
