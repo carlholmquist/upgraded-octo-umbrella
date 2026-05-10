@@ -112,7 +112,7 @@ export const siteConfig = {
             url: "https://calcforge.com",
           },
           {
-            label: "Resources for FE",
+            label: "Res FE",
             url: "https://journey2pe.com/the-ultimate-free-resource-guide-to-passing-the-fe-exam/",
           },
         ],
@@ -192,6 +192,10 @@ export const siteConfig = {
             label: "Youtube",
             url: "https://youtube.com",
           },
+          {
+            label: "HBO",
+            url: "https://play.hbomax.com",
+          },
         ],
       },{
         catname: "Developer",
@@ -221,16 +225,16 @@ export const siteConfig = {
             url: "https://youtube.com",
           },
           {
-            label: "Cloudflare Dashboard",
-            url: "https://dash.cloudflare.com/",
-          },
-          {
             label: "Brave API Dashboard",
             url: "https://api-dashboard.search.brave.com/app/dashboard",
           },
           {
             label: "Cloudflare",
             url: "https://dash.cloudflare.com/",
+          },
+          {
+            label: "Copernicus",
+            url: "https://browser.dataspace.copernicus.eu/",
           }
         ],
       },

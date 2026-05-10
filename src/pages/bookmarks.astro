@@ -30,7 +30,7 @@ const links = siteConfig.Bookmarks.flatMap((cat) => cat.links ?? []);
   .search-form {
     display: flex;
     align-items: center;
-    margin-bottom: 56px;
+    margin-bottom: 44px;
     border-bottom: 1px solid rgba(226, 230, 232, 0.15);
     padding-bottom: 2px;
   }
@@ -43,8 +43,12 @@ const links = siteConfig.Bookmarks.flatMap((cat) => cat.links ?? []);
     color: var(--text);
     font-family: inherit;
     font-size: 100%;
-    padding: 8px 0;
+    padding: 11px 0;
     letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 520px) {
+    .search-input { font-size: 16px; }
   }
 
   .search-input::placeholder {
@@ -108,17 +112,38 @@ const links = siteConfig.Bookmarks.flatMap((cat) => cat.links ?? []);
     text-decoration: none;
     color: var(--text);
     padding: 14px 0;
-    border-bottom: 1px solid var(--text-dim);
-    transition: color 275ms;
   }
-  :global(.result-item:first-child) { border-top: 1px solid var(--text-dim); }
 
   :global(.result-head) {
     display: flex;
     align-items: baseline;
     gap: 10px;
     margin-bottom: 6px;
+    position: relative;
+    overflow: hidden;
   }
+
+  :global(.result-head::before) {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: calc(3ch + 10px);
+    right: 0;
+    bottom: 0;
+    background: var(--text);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 300ms cubic-bezier(0.86, 0, 0.07, 1);
+  }
+
+  :global(.result-item:hover .result-head::before) { transform: scaleX(1); }
+
+  :global(.result-head > *:not(.nav-index)) { position: relative; z-index: 1; }
+
+  :global(.result-item:hover .result-head .char),
+  :global(.result-item:hover .result-head .char.lit) { color: var(--bg); transition: color 0ms; }
+
+  :global(.result-item:hover .result-domain) { color: var(--bg); }
 
   :global(.result-domain) {
     font-size: 11px;
@@ -191,6 +216,7 @@ const links = siteConfig.Bookmarks.flatMap((cat) => cat.links ?? []);
     const q = input.value.trim();
     if (!q) return;
 
+    input.blur();
     list.style.display = "none";
     results.style.display = "block";
     results.innerHTML = `<p class="results-status">searching_</p>`;

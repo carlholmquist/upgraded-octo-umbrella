@@ -53,6 +53,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
         document.documentElement.style.setProperty("--text", `rgb(${text})`);
         document.documentElement.style.setProperty("--text-dim", `rgba(${text}, 0.35)`);
         document.documentElement.style.setProperty("--text-mid", `rgba(${text}, 0.65)`);
+        document.documentElement.style.setProperty("--dot", `rgba(${text}, 0.11)`);
       }
       const prevBg = sessionStorage.getItem("prev-bg");
       let currentBg, currentText;
@@ -75,9 +76,9 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
         overlay.style.cssText = "position:fixed;inset:0;z-index:9999;pointer-events:none;background:" + prevBg;
         document.documentElement.appendChild(overlay);
         requestAnimationFrame(() => requestAnimationFrame(() => {
-          overlay.style.transition = "opacity 800ms ease";
+          overlay.style.transition = "opacity 150ms ease";
           overlay.style.opacity = "0";
-          setTimeout(() => overlay.remove(), 850);
+          setTimeout(() => overlay.remove(), 175);
         }));
       }
     </script>
@@ -132,6 +133,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
     --text: #a8e6be;
     --text-dim: rgba(168, 230, 190, 0.35);
     --text-mid: rgba(168, 230, 190, 0.65);
+    --dot: rgba(168, 230, 190, 0.18);
     --header-h: 60px;
     --footer-h: 50px;
   }
@@ -139,19 +141,16 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  @keyframes page-fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
   body {
-    background: var(--bg);
+    background-color: var(--bg);
+    background-image: radial-gradient(circle, var(--dot) 1px, transparent 1px);
+    background-size: 22px 22px;
+    background-position: 0 0;
     color: var(--text);
     font-family: 'IBM Plex Mono', monospace;
     font-size: 13px;
-    line-height: 1.75;
+    line-height: 22px;
     min-height: 100vh;
-    animation: page-fade-in 650ms ease both;
   }
 
   #site-header {
@@ -193,7 +192,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
   .date-dim { opacity: 0.5; }
 
   main {
-    padding: calc(var(--header-h) + 48px) 24px calc(var(--footer-h) + 48px);
+    padding: calc(var(--header-h) + 50px) 24px calc(var(--footer-h) + 48px);
     max-width: 760px;
     margin: 0 auto;
   }
@@ -210,7 +209,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
     justify-content: center;
     padding-left: 24px;
     padding-right: 24px;
-    gap: 40px;
+    gap: 65px;
   }
 
   #site-footer {
@@ -248,7 +247,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
     text-transform: uppercase;
     letter-spacing: 0.15em;
     color: var(--text-dim);
-    margin-bottom: 20px;
+    margin-bottom: 22px;
   }
 
   /* Shared animated underline link */
@@ -256,7 +255,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
     display: flex;
     align-items: center;
     gap: 10px;
-    height: 28px;
+    height: 22px;
     text-decoration: none;
     color: var(--text);
     position: relative;
@@ -276,12 +275,8 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
     letter-spacing: 0.04em;
   }
   :global(.nav-label .char) {
-    color: var(--text-dim);
-    transition: color 60ms;
-    display: inline;
-  }
-  :global(.nav-label .char.lit) {
     color: var(--text);
+    display: inline;
   }
   :global(.nav-label .char.cursor) {
     background: var(--text);
@@ -307,6 +302,9 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
   :global(.info-title .char.lit), :global(.info-bio .char.lit) { color: var(--text); }
   :global(.entry .char.cursor), :global(.prose .char.cursor), :global(.section > .skills .char.cursor),
   :global(.info-title .char.cursor), :global(.info-bio .char.cursor) { background: var(--text); color: var(--bg); }
+
+  :global(.entry:hover .entry-head .char),
+  :global(.entry:hover .entry-head .char.lit) { color: var(--bg); transition: color 0ms; }
 
 </style>
 
@@ -361,15 +359,52 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
     target.querySelectorAll(".char").forEach(c => c.classList.remove("lit", "cursor"));
   }
 
+  function resetInvert(target, chars, msPerChar) {
+    const timers = target._sweepTimers ?? [];
+    timers.forEach(clearTimeout);
+    target._sweepTimers = [];
+    const rows = getVisualLines(chars);
+    [...rows].reverse().forEach((row, rowIdx) => {
+      const rowStart = rowIdx * 80;
+      [...row].reverse().forEach((char, i) => {
+        const jitter = (Math.random() - 0.5) * msPerChar * 1.2;
+        const t = Math.max(0, rowStart + i * msPerChar + jitter);
+        target._sweepTimers.push(setTimeout(() => {
+          char.classList.remove("cursor", "lit");
+        }, t));
+      });
+    });
+  }
+
+  function sweepInvert(target, chars, msPerCharOverride) {
+    const timers = target._sweepTimers ?? [];
+    timers.forEach(clearTimeout);
+    target._sweepTimers = [];
+    const rows = getVisualLines(chars);
+    const stagger = 80;
+    rows.forEach((row, rowIdx) => {
+      const rowStart = rowIdx * stagger;
+      const msPerChar = msPerCharOverride ?? Math.min(10, Math.max(2.5, 100 / Math.max(row.length, 1)));
+      row.forEach((char, i) => {
+        const jitter = msPerCharOverride ? (Math.random() - 0.5) * msPerCharOverride * 1.2 : 0;
+        const t = rowStart + i * msPerChar + jitter;
+        target._sweepTimers.push(setTimeout(() => {
+          char.classList.add("cursor");
+          char.classList.remove("lit");
+        }, Math.max(0, t)));
+      });
+    });
+  }
+
   function initNavLinks() {
     document.querySelectorAll(".nav-label").forEach(splitChars);
     document.querySelectorAll(".nav-link").forEach((link) => {
       if (link.dataset.cursor) return;
       link.dataset.cursor = "1";
       link.addEventListener("mouseenter", () => {
-        sweepRows(link, Array.from(link.querySelectorAll(".char")));
+        sweepInvert(link, Array.from(link.querySelectorAll(".char")), 18);
       });
-      link.addEventListener("mouseleave", () => resetChars(link));
+      link.addEventListener("mouseleave", () => resetInvert(link, Array.from(link.querySelectorAll(".char")), 28));
     });
   }
 
@@ -382,6 +417,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
         li.dataset.split = "1";
         li.innerHTML = [...(li.textContent ?? "")].map(ch => `<span class="char">${ch}</span>`).join("");
       });
+
     });
     document.querySelectorAll(".section").forEach(section => {
       if (!section.querySelector(".prose")) return;
