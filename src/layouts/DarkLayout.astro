@@ -54,6 +54,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
         document.documentElement.style.setProperty("--text-dim", `rgba(${text}, 0.35)`);
         document.documentElement.style.setProperty("--text-mid", `rgba(${text}, 0.65)`);
         document.documentElement.style.setProperty("--dot", `rgba(${text}, 0.11)`);
+        document.documentElement.style.setProperty("--rule", `rgba(${text}, 0.08)`);
       }
       const prevBg = sessionStorage.getItem("prev-bg");
       let currentBg, currentText;
@@ -133,7 +134,8 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
     --text: #a8e6be;
     --text-dim: rgba(168, 230, 190, 0.35);
     --text-mid: rgba(168, 230, 190, 0.65);
-    --dot: rgba(168, 230, 190, 0.18);
+    --dot: rgba(168, 230, 190, 0.11);
+    --rule: rgba(168, 230, 190, 0.08);
     --header-h: 60px;
     --footer-h: 50px;
   }
@@ -163,7 +165,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
     padding: 0 24px;
     z-index: 100;
     background: var(--bg);
-    border-bottom: 1px solid rgba(226, 230, 232, 0.06);
+    border-bottom: 1px solid var(--rule);
   }
 
   .back-link {
@@ -172,6 +174,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
     text-decoration: none;
     letter-spacing: 0.08em;
     transition: color 275ms;
+    text-transform: uppercase;
   }
   .back-link:hover { color: var(--text); }
 
@@ -180,6 +183,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
     font-weight: 300;
     letter-spacing: 0.1em;
     color: var(--text-dim);
+    text-transform: uppercase;
   }
 
   .clock-wrap {
@@ -221,7 +225,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
     justify-content: space-between;
     padding: 0 24px;
     background: var(--bg);
-    border-top: 1px solid rgba(226, 230, 232, 0.06);
+    border-top: 1px solid var(--rule);
   }
 
   .footer-left, .footer-right {
@@ -230,6 +234,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
     letter-spacing: 0.08em;
     display: flex;
     gap: 24px;
+    text-transform: uppercase;
   }
 
   /* Shared link style for pages to use */
@@ -281,17 +286,16 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
   :global(.nav-label .char.cursor) {
     background: var(--text);
     color: var(--bg);
+    font-weight: 700;
   }
 
   /* Header / footer char styles */
   :global(.back-link .char), :global(.header-left .char), :global(.header-right .char),
   :global(.footer-left .char), :global(.footer-right .char) {
-    color: var(--text-dim); transition: color 60ms; display: inline;
+    color: var(--text-dim); display: inline;
   }
-  :global(.back-link .char.lit), :global(.header-left .char.lit), :global(.header-right .char.lit),
-  :global(.footer-left .char.lit), :global(.footer-right .char.lit) { color: var(--text); }
   :global(.back-link .char.cursor), :global(.header-left .char.cursor), :global(.header-right .char.cursor),
-  :global(.footer-left .char.cursor), :global(.footer-right .char.cursor) { background: var(--text); color: var(--bg); }
+  :global(.footer-left .char.cursor), :global(.footer-right .char.cursor) { background: var(--text); color: var(--bg); font-weight: 700; }
 
   /* Shared char styles for entry, section, and info sweeps */
   :global(.entry .char), :global(.prose .char), :global(.section > .skills .char),
@@ -501,7 +505,7 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
   }
 
   function initHeaderFooter() {
-    const skipIds = new Set(['clock', 'date']);
+    const skipIds = new Set(['clock', 'date', 'foot-left']);
     const selectors = ['.back-link', '.header-left', '.header-right', '.footer-left', '.footer-right'];
     selectors.forEach(sel => {
       document.querySelectorAll(sel).forEach(container => {
@@ -514,9 +518,11 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
         targets.forEach(splitChars);
 
         container.addEventListener('mouseenter', () =>
-          sweepRows(container, Array.from(container.querySelectorAll('.char')))
+          sweepInvert(container, Array.from(container.querySelectorAll('.char')), 18)
         );
-        container.addEventListener('mouseleave', () => resetChars(container));
+        container.addEventListener('mouseleave', () =>
+          resetInvert(container, Array.from(container.querySelectorAll('.char')), 28)
+        );
       });
     });
   }

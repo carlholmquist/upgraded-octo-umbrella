@@ -1,65 +1,1098 @@
 ---
 import DarkLayout from "../layouts/DarkLayout.astro";
+import rawPhotos from "../data/photos.json";
 import { siteConfig } from "../config";
 
-const nav = [
-  { index: "001", label: "About", url: "/about" },
-  { index: "002", label: "Photography", url: "/photography" },
-  { index: "003", label: "Bookmarks", url: "/bookmarks" },
-  { index: "004", label: "Heatmap", url: "/heatmap" },
-];
+const cloudName = "drey6ump8";
+function photoName(path: string) {
+  const base = (path.split('/').pop() ?? path).replace(/\.[^.]+$/, '');
+  return base.replace(/_[a-z0-9]{6}$/, '');
+}
+function photoYear(path: string) {
+  const m = path.match(/20\d\d/);
+  return m ? m[0] : '—';
+}
+const aboutData = {
+  aboutMe: siteConfig.aboutMe,
+  skills: siteConfig.skills,
+  experience: siteConfig.experience,
+  education: siteConfig.education,
+  projects: siteConfig.projects,
+  social: siteConfig.social,
+};
+
+const bookmarksData = siteConfig.Bookmarks.flatMap(cat =>
+  (cat.links ?? []).map(link => ({
+    label: link.label,
+    url: link.url,
+    category: cat.catname,
+  }))
+);
+
+const photosData = (rawPhotos as string[]).map(path => ({
+  name: photoName(path),
+  year: photoYear(path),
+  full: `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto,w_1800/${path}`,
+}));
 ---
 
-<DarkLayout title="Carl Holmquist" showClock centerMain>
+<DarkLayout title="Carl Holmquist" showClock>
   <span slot="header-left">Carl Holmquist</span>
-  <span slot="footer-left">holmquist.studio</span>
-  <a slot="footer-right" href={`mailto:${siteConfig.social.email}`} class="dark-link">{siteConfig.social.email}</a>
+  <span slot="footer-left" id="foot-left">~</span>
+  <span slot="footer-right"><span class="hint-desktop">TAB COMPLETE · ↑ HISTORY · </span><span id="help-btn" style="color: var(--text-mid); cursor: pointer;">HELP</span></span>
 
-  <div class="info">
-    <p class="info-title">{siteConfig.title}</p>
-    <p class="info-bio">{siteConfig.info}</p>
+  <div id="term">
+    <div id="scrollback"></div>
+    <div class="prompt-row" id="prompt-live">
+      <span class="prompt">
+        <span class="user">carl</span><span class="at"> @ studio </span><span id="prompt-cwd" class="cwd">~</span><span class="dollar"> $ </span>
+      </span>
+      <span class="input-wrap"><span id="term-ghost" class="ghost"></span><span id="hint-enter" class="hint-enter">&nbsp;(hit enter)</span><input id="term-input" class="hidden-input" type="text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" /></span>
+    </div>
   </div>
 
-  <nav class="link-list">
-      {nav.map(({ index, label, url }) => (
-        <a href={url} class="nav-link">
-          <span class="nav-index">{index}</span>
-          <span class="nav-label">{label}</span>
-        </a>
-      ))}
-  </nav>
+  <article id="man-page" class="man" style="display:none;"></article>
+  <script type="application/json" id="about-data" set:html={JSON.stringify(aboutData)} />
+  <script type="application/json" id="photos-data" set:html={JSON.stringify(photosData)} />
+  <script type="application/json" id="bookmarks-data" set:html={JSON.stringify(bookmarksData)} />
 </DarkLayout>
 
 <style>
-  .info {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
+  :global(main) {
+    max-width: 880px;
+    padding-top: calc(var(--header-h) + 40px);
+    padding-bottom: calc(var(--footer-h) + 32px);
   }
 
-  .info-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: 0.05em;
+  /* term */
+  #term { display: flex; flex-direction: column; gap: 2px; min-height: 60vh; }
+
+  :global(.term-line) { white-space: pre-wrap; word-break: break-word; }
+  :global(.term-line.dim) { color: var(--text-dim); }
+  :global(.term-line.mid) { color: var(--text-mid); }
+
+  :global(.prompt-row) { display: flex; gap: 6px; align-items: baseline; color: var(--text-mid); }
+  :global(.prompt) { flex: 0 0 auto; color: var(--text-dim); }
+  :global(.prompt .user) { color: var(--text-mid); }
+  :global(.prompt .cwd)  { color: var(--text); }
+  :global(.prompt .at), :global(.prompt .dollar) { color: var(--text-dim); }
+  :global(.echo-cmd) { color: var(--text); }
+
+  :global(.input-wrap) { flex: 1; position: relative; display: inline-block; min-height: 22px; }
+  :global(.ghost) { color: var(--text); white-space: pre; }
+  :global(.ghost::after) {
+    content: '';
+    display: inline-block; width: 8px; height: 14px;
+    background: var(--text); vertical-align: -2px;
+    animation: blink 1.05s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  :global(.hint-enter) { color: var(--text-dim); font-style: italic; pointer-events: none; }
+
+  :global(.hidden-input) {
+    position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%;
+    border: 0; background: transparent; color: transparent; caret-color: transparent;
+    font: inherit; padding: 0; outline: none;
+    font-size: 16px; /* prevent iOS zoom */
   }
 
-  .info-bio {
-    font-size: 100%;
-    font-weight: 300;
-    color: var(--text);
-    line-height: 22px;
-    text-align: justify;
+  /* ls — long */
+  :global(.ls-block) { margin: 6px 0; }
+  :global(.ls-row) {
+    display: grid;
+    grid-template-columns: 100px 26px 36px 70px 100px 1fr;
+    gap: 14px; padding: 0 6px; border-radius: 2px;
+    color: var(--text-mid); white-space: nowrap; cursor: pointer;
   }
+  :global(a.ls-row) { text-decoration: none; }
+  :global(.ls-row .name) { color: var(--text); }
+  :global(.ls-row.type-dir .name::after) { content: '/'; color: var(--text-dim); }
+  :global(.ls-row.is-hidden .name) { color: var(--text-mid); }
+  :global(.ls-row:hover) { background: var(--text); color: var(--bg); }
+  :global(.ls-row:hover .name), :global(.ls-row:hover span) { color: var(--bg); }
 
-  .link-list {
-    columns: 3;
-    column-gap: 32px;
-    column-fill: auto;
-    height: 280px;
+  /* ls — compact */
+  :global(.ls-compact) { display: flex; flex-wrap: wrap; gap: 0 28px; row-gap: 4px; }
+  :global(.ls-compact .item) { cursor: pointer; color: var(--text); }
+  :global(.ls-compact .item.dir::after) { content: '/'; color: var(--text-dim); }
+  :global(.ls-compact .item.hidden) { color: var(--text-mid); }
+  :global(.ls-compact .item:hover) { background: var(--text); color: var(--bg); }
+
+  /* ls — numbered nav */
+  :global(.ls-nav) { display: flex; flex-direction: column; gap: 2px; }
+  :global(.ls-nav-row) {
+    display: flex; align-items: baseline; gap: 18px;
+    padding: 6px 6px; border-radius: 2px; cursor: pointer;
   }
+  :global(.ls-nav-idx) { color: var(--text-dim); width: 38px; font-size: 11px; letter-spacing: 0.1em; }
+  :global(.ls-nav-name) {
+    color: var(--text); font-size: 17px; line-height: 24px;
+    font-weight: 300; letter-spacing: -0.005em;
+  }
+  :global(.ls-nav-row.is-hidden .ls-nav-name) { color: var(--text-mid); }
+  :global(.ls-nav-row:hover) { background: var(--text); }
+  :global(.ls-nav-row:hover .ls-nav-idx) { color: var(--bg); opacity: 0.7; }
+  :global(.ls-nav-row:hover .ls-nav-name) { color: var(--bg); }
 
-  @media (max-width: 520px) {
-    .link-list { columns: 2; height: 390px; }
+
+  /* inline photo */
+  :global(.photo-inline) { margin: 8px 0; max-width: 640px; }
+  :global(.photo-inline img) { width: 100%; height: auto; display: block; border: 1px solid var(--rule); }
+  :global(.photo-cap) { margin-top: 4px; }
+
+  /* manpage */
+  :global(.man) { max-width: 720px; margin: 0 auto; }
+  :global(.man-meta) {
+    display: flex; flex-wrap: wrap; gap: 24px; color: var(--text-dim);
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  :global(.man-meta b) { color: var(--text-mid); font-weight: 400; }
+  :global(.man-title) {
+    font-size: 52px; line-height: 56px; font-weight: 300;
+    color: var(--text); letter-spacing: -0.02em; text-transform: lowercase;
+    margin-bottom: 12px;
+  }
+  :global(.man-sub) { color: var(--text-mid); max-width: 56ch; margin-bottom: 34px; }
+  :global(.man h3) {
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--text-dim); font-weight: 400; margin: 28px 0 10px;
+  }
+  :global(.man p) { color: var(--text-mid); max-width: 60ch; margin-bottom: 10px; }
+  :global(.man pre.figure) {
+    padding: 18px 20px; border: 1px solid var(--rule); margin: 22px 0;
+    color: var(--text-mid); line-height: 16px; font-size: 11px;
+    white-space: pre; overflow-x: auto;
+  }
+  :global(.man pre.figure .cap) {
+    display: block; margin-top: 10px; color: var(--text-dim);
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  :global(.man .links a) {
+    color: var(--text); text-decoration: none;
+    border-bottom: 1px solid var(--text-mid); margin-right: 18px;
+  }
+  :global(.man-foot) {
+    margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--rule);
+    color: var(--text-dim); display: flex; justify-content: space-between;
+  }
+  :global(.man-foot a) { color: var(--text-mid); text-decoration: none; }
+  :global(.man-foot a:hover) { color: var(--text); }
+
+  @media (max-width: 640px) {
+    /* Tighter horizontal padding */
+    :global(main) { padding-left: 12px; padding-right: 12px; }
+    :global(body) { overflow-x: hidden; }
+
+    /* Shorter prompt: hide "carl @ studio" */
+    :global(.prompt .user), :global(.prompt .at) { display: none; }
+
+    /* Allow prompt row to wrap if cwd is long */
+    :global(.prompt-row) { flex-wrap: wrap; }
+
+    /* ls-row: collapse to year + name only */
+    :global(div.ls-row) { grid-template-columns: 48px 1fr; gap: 8px; }
+    :global(div.ls-row span:nth-child(1)),
+    :global(div.ls-row span:nth-child(2)),
+    :global(div.ls-row span:nth-child(3)),
+    :global(div.ls-row span:nth-child(4)) { display: none; }
+
+    /* Search rows override inline grid: hide perms, show domain + title */
+    :global(a.ls-row) { grid-template-columns: 90px 1fr !important; gap: 8px; }
+    :global(a.ls-row span:nth-child(1)) { display: none; }
+
+    /* Photos full width */
+    :global(.photo-inline) { max-width: 100%; }
+
+    /* Smaller man title */
+    :global(.man-title) { font-size: 28px; line-height: 34px; }
+
+    /* Footer: hide long hint text on small screens */
+    :global(.hint-desktop) { display: none; }
   }
 </style>
+
+<script is:inline>
+(function () {
+
+// ---------- about data ----------
+const ABOUT = JSON.parse(document.getElementById('about-data').textContent);
+
+// ---------- filesystem ----------
+const HOME = [
+  {
+    name: '.intro', type: 'file', hidden: true,
+    perms: '-rw-r--r--', size: '0.3k', year: '2026',
+    cat: "hej.\n\ni'm carl. engineer. i build things and take photos.\ninterested in structures, tools, and making things work.\nhouston, tx (from sweden).",
+  },
+  {
+    name: 'README', type: 'file', hidden: false,
+    perms: '-rw-r--r--', size: '0.2k', year: '2026',
+    cat: "this is a small terminal you can poke around in.\ntype `ls` or `help`, or just click any name below.\n`ls -a` shows the rest.",
+  },
+  (function() {
+    const a = ABOUT;
+    const sections = [];
+    sections.push({ h: 'about', p: a.aboutMe.split('\n\n').filter(Boolean) });
+    if (a.skills?.length) sections.push({ h: 'skills', p: [a.skills.join('  ·  ')] });
+    a.experience?.forEach(e => {
+      sections.push({ h: e.company, p: [e.title + '  ·  ' + e.dateRange, ...e.bullets] });
+    });
+    a.education?.forEach(e => {
+      sections.push({ h: e.school, p: [e.degree + '  ·  ' + e.dateRange, ...(e.achievements ?? [])] });
+    });
+    a.projects?.forEach(p => {
+      sections.push({ h: p.name, p: [p.description] });
+    });
+    const links = [];
+    if (a.social?.email) links.push({ label: 'email', href: 'mailto:' + a.social.email });
+    if (a.social?.linkedin) links.push({ label: 'linkedin', href: a.social.linkedin });
+    if (a.social?.github) links.push({ label: 'github', href: a.social.github });
+    return {
+      name: 'about', type: 'work', hidden: false, inline: true,
+      perms: 'drwxr-xr-x', size: '—', year: '—',
+      title: 'about', kind: 'biography · cv', status: 'always wip',
+      stack: 'sweden → houston, tx',
+      blurb: a.aboutMe.split('\n\n')[0].slice(0, 120) + '…',
+      sections, links,
+    };
+  })(),
+  {
+    name: 'photography', type: 'dir', hidden: false,
+    perms: 'drwxr-xr-x', size: '—', year: '2018–',
+  },
+  {
+    name: 'bookmarks', type: 'dir', hidden: false,
+    perms: 'drwxr-xr-x', size: '—', year: '—',
+  },
+  {
+    name: 'heatmap', type: 'link', hidden: false,
+    perms: 'lrwxr-xr-x', size: '—', year: '2025',
+    title: 'heatmap', kind: 'visualization · external',
+    blurb: "where i've been, lately.",
+    href: '/heatmap',
+  },
+  {
+    name: 'projects', type: 'dir', hidden: false,
+    perms: 'drwxr-xr-x', size: '—', year: '2022–',
+  },
+  {
+    name: '.colophon', type: 'file', hidden: true,
+    perms: '-rw-r--r--', size: '0.2k', year: '2026',
+    cat: "set in IBM Plex Mono. dot grid is 22px.\nno analytics. no cookies. theme is random per visit.\nbuilt late at night.",
+  },
+];
+
+const PROJECTS = [
+  {
+    name: 'README', type: 'file', hidden: false,
+    perms: '-rw-r--r--', size: '0.4k', year: '2026',
+    cat: "hi.\n\nthis is a small archive of things i've made.\nnothing here is finished. type `help` for commands,\nor click any name to open it. `ls -a` shows the rest.",
+  },
+  {
+    name: 'ghost', type: 'app', hidden: false,
+    perms: 'drwxr-xr-x', size: '2.3k', year: '2025',
+    title: 'ghost', kind: 'application · ios', status: 'live',
+    stack: 'swift · core location · sqlite',
+    blurb: 'a location timeline that quietly logs where you have been, so you can re-read your year as geography.',
+    sections: [
+      { h: 'why', p: [
+        "i wanted a notebook for places, not for words. something that runs in the background, never asks for input, and gives me a quiet map of a year — every café, every detour, every two-hour walk that i forget i took.",
+      ]},
+      { h: 'how', p: [
+        "significant-location updates on ios, batched to disk, replayed into a tile renderer. no servers. no accounts. export to gpx when you want to take your year with you.",
+      ]},
+    ],
+    figure: "┌──────────────────────────────────────────────────┐\n│  · · · · · · · · ·  ●─────●                      │\n│  · · · · · · ●─────●     │                       │\n│  · · · · ●───●           │                       │\n│  · · · · │               ●──────●                │\n│  · · · · ●─────●                │                │\n│                                 ●──● · · · · · · │\n└──────────────────────────────────────────────────┘\n   STOCKHOLM · 14 OCT · 9 PINGS",
+    figureCap: 'FIG. 01 · ONE DAY, RENDERED FROM ~150 PINGS',
+    links: [{ label: 'ghost.app', href: '#' }, { label: 'github', href: '#' }],
+  },
+  {
+    name: 'wood', type: 'thesis', hidden: false,
+    perms: 'drwxr-xr-x', size: '128k', year: '2023',
+    title: 'on the anisotropy of solid wood', kind: 'master thesis', status: 'archived',
+    stack: 'python · abaqus · 24 specimens',
+    blurb: 'a bench-and-model study of how solid wood deforms when its moisture content swings, and a small toolchain for predicting warp from species and cut.',
+    sections: [
+      { h: 'thesis', p: [
+        "wood is anisotropic and hygroscopic. that is two boring words for a quiet kind of magic: a flat board, left in a different room for a week, will cup or twist or split. cabinetmakers have known this for a thousand years; engineers model it badly.",
+        "i spent a year poking at small specimens of picea abies and quercus robur, watching them shrink between 12% and 6% moisture content, trying to predict — from species, cut and grain angle — which way they would move.",
+      ]},
+      { h: 'result', p: [
+        "a finite-element model that gets within ~14% of measured deformation on flatsawn boards, and within ~22% on quartersawn. a short paper, a long appendix, and an enormous respect for whoever made the chair you are sitting on.",
+      ]},
+    ],
+    figure: "┌──────────────────────────────────────────────────┐\n│ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │\n│ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │\n│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  │\n│  ↑ tangential          →  longitudinal           │\n└──────────────────────────────────────────────────┘\n   PICEA ABIES · 12% MC → 6% MC · n=24",
+    figureCap: 'FIG. 02 · SHRINKAGE BY GRAIN ORIENTATION',
+    links: [{ label: 'thesis.pdf', href: '#' }, { label: 'data', href: '#' }],
+  },
+  {
+    name: 'things', type: 'work', hidden: false,
+    perms: 'drwxr-xr-x', size: '∞', year: '2022–',
+    title: 'things, made', kind: 'workshop · ongoing', status: 'open',
+    stack: 'ash · oak · linseed oil · patience',
+    blurb: 'furniture and small objects built in a one-room workshop in stockholm. stools, shelves, a folding desk, a lamp that did not work.',
+    sections: [
+      { h: 'inventory', p: [
+        "three stools (ash, splayed legs, mortise-and-tenon). one shelf (oak, dadoed, two coats of hardwax oil). one folding desk (birch ply, the hinges are wrong, i am redoing it). one lamp (failed, the cord melted, do not ask).",
+      ]},
+      { h: 'notes', p: [
+        "most of what i make is too thick. i am working on this. joinery first, finish second; if the joinery is honest the finish does not need to lie.",
+      ]},
+    ],
+    figure: "┌──────────────────────────────────────────────────┐\n│         ┌──────┐                                 │\n│        ╱ stool ╱│        ┌────────────┐          │\n│       ┌──────┐ │         │   shelf    │          │\n│       │      │/          └────────────┘          │\n│       └──────┘                                   │\n│                          ┌──┐ ┌──┐               │\n│                          │  │ │  │  desk         │\n└──────────────────────────────────────────────────┘",
+    figureCap: 'FIG. 03 · INVENTORY · 2022 → NOW',
+    links: [{ label: 'photos', href: '#' }],
+  },
+  {
+    name: '.well-hidden', type: 'file', hidden: true,
+    perms: '-rw-------', size: '0.0k', year: '????',
+    cat: "you found it. there is nothing here. or maybe there is.",
+  },
+];
+
+// ---------- bookmarks ----------
+const BOOKMARKS = JSON.parse(document.getElementById('bookmarks-data').textContent).map(b => ({
+  name: b.label,
+  type: 'bookmark',
+  hidden: false,
+  perms: 'lrwxr-xr-x',
+  size: '—',
+  year: b.category,
+  url: b.url,
+}));
+
+// ---------- photos ----------
+const PHOTOS = JSON.parse(document.getElementById('photos-data').textContent).map(p => ({
+  name: p.name,
+  type: 'photo',
+  hidden: false,
+  perms: '-rw-r--r--',
+  size: '—',
+  year: p.year,
+  full: p.full,
+}));
+
+// ---------- state ----------
+let cwd = '~';
+let history = [];
+let histIdx = -1;
+let firstCommand = true;
+let prefillActive = true;
+
+// ---------- dom refs ----------
+const termEl    = document.getElementById('term');
+const scrollEl  = document.getElementById('scrollback');
+const inputEl   = document.getElementById('term-input');
+const ghostEl   = document.getElementById('term-ghost');
+const cwdEl     = document.getElementById('prompt-cwd');
+const manEl     = document.getElementById('man-page');
+const footLeft  = document.getElementById('foot-left');
+const helpBtn   = document.getElementById('help-btn');
+
+// ---------- utils ----------
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function listAt(path) {
+  if (path === '~') return HOME;
+  if (path === '~/projects') return PROJECTS;
+  if (path === '~/photography') return PHOTOS;
+  if (path === '~/bookmarks') return BOOKMARKS;
+  return [];
+}
+
+function findEntry(path, name) {
+  return listAt(path).find(e => e.name === name);
+}
+
+function visible(entries, showHidden) {
+  return entries.filter(e => showHidden || !e.hidden);
+}
+
+function asciiTree(cwdPath) {
+  if (cwdPath === '~') return [
+    "~",
+    "├── README",
+    "├── about",
+    "├── photography/",
+    "├── bookmarks/",
+    "├── heatmap      →",
+    "├── projects/",
+    "│   ├── README",
+    "│   ├── ghost",
+    "│   ├── wood",
+    "│   └── things",
+    "└── (2 hidden)",
+  ].join('\n');
+  return [
+    "~/projects",
+    "├── README",
+    "├── ghost",
+    "├── wood",
+    "├── things",
+    "└── (1 hidden)",
+  ].join('\n');
+}
+
+function scrollBottom() {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+function updateFooter() {
+  if (footLeft) footLeft.textContent = cwd.toUpperCase();
+  if (cwdEl) cwdEl.textContent = cwd;
+}
+
+// ---------- dom builders ----------
+function appendSpacer() {
+  const d = document.createElement('div');
+  d.style.height = '12px';
+  scrollEl.appendChild(d);
+}
+
+function appendLine(cls, text) {
+  const d = document.createElement('div');
+  d.className = 'term-line' + (cls ? ' ' + cls : '');
+  d.textContent = text;
+  scrollEl.appendChild(d);
+}
+
+function appendPromptEcho(cwdStr, cmd) {
+  const row = document.createElement('div');
+  row.className = 'prompt-row';
+  row.innerHTML =
+    `<span class="prompt"><span class="user">carl</span><span class="at"> @ studio </span><span class="cwd">${esc(cwdStr)}</span><span class="dollar"> $ </span></span>` +
+    `<span class="echo-cmd">${esc(cmd)}</span>`;
+  scrollEl.appendChild(row);
+  return row;
+}
+
+function scrollToEl(el) {
+  requestAnimationFrame(() => {
+    const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 60;
+    const top = el.getBoundingClientRect().top + window.scrollY - headerH - 16;
+    window.scrollTo({ top, behavior: 'smooth' });
+  });
+}
+
+function appendLsLong(rows) {
+  const block = document.createElement('div');
+  block.className = 'ls-block';
+  const total = document.createElement('div');
+  total.className = 'term-line dim';
+  total.textContent = 'total ' + rows.length;
+  block.appendChild(total);
+  rows.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'ls-row type-' + r.type + (r.hidden ? ' is-hidden' : '');
+    row.title = 'open ' + r.name;
+    row.innerHTML =
+      `<span>${esc(r.perms)}</span>` +
+      `<span>1</span>` +
+      `<span>m</span>` +
+      `<span>${esc(r.size)}</span>` +
+      `<span>${esc(r.year)}</span>` +
+      `<span class="name">${esc(r.name)}${r.type === 'link' ? ' →' : ''}</span>`;
+    row.addEventListener('click', () => openName(r.name));
+    block.appendChild(row);
+  });
+  scrollEl.appendChild(block);
+}
+
+function appendLsCompact(rows) {
+  const block = document.createElement('div');
+  block.className = 'ls-block';
+  const wrap = document.createElement('div');
+  wrap.className = 'ls-compact';
+  rows.forEach(r => {
+    const span = document.createElement('span');
+    span.className = 'item' + (r.type === 'dir' ? ' dir' : '') + (r.hidden ? ' hidden' : '');
+    span.textContent = r.name + (r.type === 'link' ? ' →' : '');
+    span.addEventListener('click', () => openName(r.name));
+    wrap.appendChild(span);
+  });
+  block.appendChild(wrap);
+  scrollEl.appendChild(block);
+}
+
+function appendLsNav(rows) {
+  const block = document.createElement('div');
+  block.className = 'ls-block';
+  const nav = document.createElement('div');
+  nav.className = 'ls-nav';
+  rows.forEach((r, i) => {
+    const row = document.createElement('div');
+    row.className = 'ls-nav-row type-' + r.type + (r.hidden ? ' is-hidden' : '');
+    row.innerHTML =
+      `<span class="ls-nav-idx">${String(i + 1).padStart(3, '0')}</span>` +
+      `<span class="ls-nav-name">${esc(r.name)}${r.type === 'dir' ? '/' : ''}${r.type === 'link' ? ' →' : ''}</span>`;
+    row.addEventListener('click', () => openName(r.name));
+    nav.appendChild(row);
+  });
+  block.appendChild(nav);
+  scrollEl.appendChild(block);
+}
+
+function appendLs(rows, mode) {
+  if (mode === 'long') appendLsLong(rows);
+  else if (mode === 'compact') appendLsCompact(rows);
+  else if (mode === 'nav') appendLsNav(rows);
+  else appendLsLong(rows);
+}
+
+function appendPhotoGallery(rows) {
+  const block = document.createElement('div');
+  block.className = 'ls-block photo-gallery';
+  const total = document.createElement('div');
+  total.className = 'term-line dim';
+  total.textContent = 'total ' + rows.length;
+  block.appendChild(total);
+  rows.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'ls-row type-photo';
+    row.innerHTML =
+      `<span>${esc(r.perms)}</span><span>1</span><span>carl</span>` +
+      `<span>${esc(r.size)}</span><span>${esc(r.year)}</span>` +
+      `<span class="name">${esc(r.name)}</span>`;
+    block.appendChild(row);
+    const wrap = document.createElement('div');
+    wrap.className = 'photo-inline';
+    const img = document.createElement('img');
+    img.src = r.full;
+    img.alt = r.name;
+    img.loading = 'lazy';
+    wrap.appendChild(img);
+    block.appendChild(wrap);
+  });
+  scrollEl.appendChild(block);
+}
+
+function appendBookmarkList(rows) {
+  const block = document.createElement('div');
+  block.className = 'ls-block';
+  const total = document.createElement('div');
+  total.className = 'term-line dim';
+  total.textContent = 'total ' + rows.length;
+  block.appendChild(total);
+  let lastCat = null;
+  rows.forEach(r => {
+    if (r.year !== lastCat) {
+      lastCat = r.year;
+      const hdr = document.createElement('div');
+      hdr.className = 'term-line dim bookmark-cat';
+      hdr.textContent = '# ' + r.year;
+      block.appendChild(hdr);
+    }
+    const row = document.createElement('div');
+    row.className = 'ls-row type-bookmark';
+    row.innerHTML =
+      `<span>${esc(r.perms)}</span><span>1</span><span>carl</span>` +
+      `<span>${esc(r.size)}</span><span>${esc(r.year)}</span>` +
+      `<span class="name">${esc(r.name)} →</span>`;
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', () => window.open(r.url, '_blank', 'noopener'));
+    block.appendChild(row);
+  });
+  scrollEl.appendChild(block);
+}
+
+// ---------- inline manpage ----------
+function appendManInline(entry) {
+  const m = entry;
+
+  // meta line
+  const metaParts = [m.kind, m.status, m.stack].filter(Boolean);
+  if (metaParts.length) appendLine('dim', metaParts.join('  ·  '));
+  appendSpacer();
+
+  // sections
+  if (m.sections) {
+    m.sections.forEach((s, i) => {
+      const hdr = document.createElement('div');
+      hdr.style.cssText = 'display:inline-block;background:var(--text);color:var(--bg);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;padding:1px 6px;margin-bottom:8px;';
+      hdr.textContent = String(i + 1).padStart(2, '0') + ' / ' + s.h;
+      scrollEl.appendChild(hdr);
+      s.p.forEach(para => appendLine('mid', para));
+      appendSpacer();
+    });
+  }
+
+  // links
+  if (m.links?.length) {
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'display:inline-block;background:var(--text);color:var(--bg);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;padding:1px 6px;margin-bottom:8px;';
+    hdr.textContent = 'links';
+    scrollEl.appendChild(hdr);
+    const linkRow = document.createElement('div');
+    linkRow.style.cssText = 'display:flex;gap:18px;flex-wrap:wrap;';
+    m.links.forEach(l => {
+      const a = document.createElement('a');
+      a.href = l.href;
+      a.textContent = l.label + ' ↗';
+      a.style.cssText = 'color:var(--text);text-decoration:none;border-bottom:1px solid var(--text-mid);';
+      linkRow.appendChild(a);
+    });
+    scrollEl.appendChild(linkRow);
+    appendSpacer();
+  }
+}
+
+// ---------- manpage ----------
+function showMan(entry) {
+  const m = entry;
+  let html = `<div class="man-meta">`;
+  html += `<span><b>name</b>&nbsp;&nbsp;${esc(m.name)}</span>`;
+  if (m.kind)   html += `<span><b>kind</b>&nbsp;&nbsp;${esc(m.kind)}</span>`;
+  if (m.year)   html += `<span><b>year</b>&nbsp;&nbsp;${esc(m.year)}</span>`;
+  if (m.status) html += `<span><b>status</b>&nbsp;&nbsp;${esc(m.status)}</span>`;
+  if (m.stack)  html += `<span><b>stack</b>&nbsp;&nbsp;${esc(m.stack)}</span>`;
+  html += `</div>`;
+  html += `<h1 class="man-title">${esc(m.title)}</h1>`;
+  if (m.blurb) html += `<p class="man-sub">${esc(m.blurb)}</p>`;
+  if (m.sections) {
+    m.sections.forEach((s, i) => {
+      html += `<section><h3>— ${String(i + 1).padStart(2, '0')} / ${esc(s.h)}</h3>`;
+      s.p.forEach(para => { html += `<p>${esc(para)}</p>`; });
+      html += `</section>`;
+    });
+  }
+  if (m.figure) {
+    html += `<pre class="figure">${esc(m.figure)}<span class="cap">${esc(m.figureCap || '')}</span></pre>`;
+  }
+  if (m.links) {
+    html += `<section class="links"><h3>— links</h3>`;
+    m.links.forEach(l => { html += `<a href="${esc(l.href)}">${esc(l.label)} ↗</a>`; });
+    html += `</section>`;
+  }
+  html += `<div class="man-foot"><a href="#" id="man-back">← cd ..</a><span>esc · ${esc(cwd)}</span></div>`;
+  manEl.innerHTML = html;
+  manEl.style.display = '';
+  termEl.style.display = 'none';
+  document.getElementById('man-back').addEventListener('click', e => { e.preventDefault(); closeMan(); });
+  scrollBottom();
+}
+
+function closeMan() {
+  manEl.style.display = 'none';
+  termEl.style.display = '';
+  setTimeout(() => inputEl.focus({ preventScroll: true }), 0);
+  scrollBottom();
+}
+
+// ---------- inline photo ----------
+function appendInlinePhoto(entry) {
+  const wrap = document.createElement('div');
+  wrap.className = 'photo-inline';
+  const img = document.createElement('img');
+  img.src = entry.full;
+  img.alt = entry.name;
+  const cap = document.createElement('div');
+  cap.className = 'photo-cap term-line dim';
+  cap.textContent = entry.name;
+  wrap.appendChild(img);
+  wrap.appendChild(cap);
+  scrollEl.appendChild(wrap);
+}
+
+// ---------- open entry ----------
+function openName(name) {
+  const e = findEntry(cwd, name);
+  if (!e) {
+    appendPromptEcho(cwd, 'open ' + name);
+    appendLine('dim', 'no such file or directory: ' + name);
+    appendSpacer();
+    scrollBottom();
+    return;
+  }
+  if (e.type === 'photo') {
+    appendPromptEcho(cwd, 'open ' + name);
+    appendInlinePhoto(e);
+    appendSpacer();
+    scrollBottom();
+    return;
+  }
+  if (e.type === 'bookmark') {
+    appendPromptEcho(cwd, 'open ' + name);
+    appendLine('mid', '→ ' + e.url);
+    appendSpacer();
+    scrollBottom();
+    window.open(e.url, '_blank', 'noopener');
+    return;
+  }
+  if (e.type === 'file') {
+    appendPromptEcho(cwd, 'cat ' + name);
+    appendLine('mid', e.cat || '(empty)');
+    appendSpacer();
+    scrollBottom();
+    return;
+  }
+  if (e.type === 'link') {
+    appendPromptEcho(cwd, 'open ' + name);
+    appendLine('mid', '→ ' + e.href);
+    appendSpacer();
+    scrollBottom();
+    setTimeout(() => { window.location.href = e.href; }, 300);
+    return;
+  }
+  if (e.type === 'dir') {
+    appendPromptEcho(cwd, 'cd ' + name);
+    cwd = cwd === '~' ? '~/' + name : cwd + '/' + name;
+    updateFooter();
+    appendSpacer();
+    const lsEcho = appendPromptEcho(cwd, 'ls');
+    if (cwd === '~/photography') appendPhotoGallery(visible(listAt(cwd), false));
+    else if (cwd === '~/bookmarks') appendBookmarkList(visible(listAt(cwd), false));
+    else appendLsLong(visible(listAt(cwd), false));
+    appendSpacer();
+    if (cwd === '~/photography' || cwd === '~/bookmarks') scrollToEl(lsEcho);
+    else scrollBottom();
+    return;
+  }
+  // app / thesis / work → manpage (inline or fullscreen)
+  const manEcho = appendPromptEcho(cwd, 'cd ' + name);
+  if (e.inline) {
+    appendManInline(e);
+    appendSpacer();
+    scrollToEl(manEcho);
+  } else {
+    scrollBottom();
+    setTimeout(() => showMan(e), 60);
+  }
+}
+
+function goUp() {
+  if (cwd === '~') return;
+  const parent = cwd.split('/').slice(0, -1).join('/') || '~';
+  appendPromptEcho(cwd, 'cd ..');
+  cwd = parent;
+  updateFooter();
+  appendSpacer();
+  appendPromptEcho(cwd, 'ls');
+  appendLsLong(visible(listAt(cwd), false));
+  appendSpacer();
+  scrollBottom();
+}
+
+// ---------- command parser ----------
+function run(raw) {
+  const cmd = raw.trim();
+  if (!cmd) { appendPromptEcho(cwd, raw); scrollBottom(); return; }
+
+  const parts = cmd.split(/\s+/);
+  const head = parts[0];
+  const rest = parts.slice(1);
+
+  const cmdEcho = appendPromptEcho(cwd, raw);
+
+  if (head === 'ls') {
+    const showHidden = rest.some(a => /^-[la]*a/.test(a) || a === '--all');
+    const rows = visible(listAt(cwd), showHidden);
+    if (cwd === '~/photography') appendPhotoGallery(rows);
+    else if (cwd === '~/bookmarks') appendBookmarkList(rows);
+    else appendLsLong(rows);
+    appendSpacer();
+    if (cwd === '~/photography' || cwd === '~/bookmarks') scrollToEl(cmdEcho);
+    else scrollBottom();
+    return;
+  }
+
+  if (head === 'cat') {
+    const tgt = rest[0];
+    const e = tgt ? findEntry(cwd, tgt) : null;
+    if (!e) {
+      appendLine('dim', 'cat: ' + (tgt || '(missing operand)') + ': no such file');
+    } else if (e.cat) {
+      appendLine('mid', e.cat);
+    } else if (e.blurb) {
+      appendLine('mid', e.blurb + (e.href ? '\n→ ' + e.href : ''));
+    } else {
+      appendLine('dim', e.name + ' is a ' + e.type + '. try `cd ' + e.name + '`.');
+    }
+    appendSpacer();
+    scrollBottom();
+    return;
+  }
+
+  if (head === 'cd' || head === 'open') {
+    const tgt = rest[0];
+    if (!tgt || tgt === '~' || tgt === '/') {
+      if (cwd !== '~') {
+        cwd = '~';
+        updateFooter();
+        appendSpacer();
+        appendPromptEcho('~', 'ls');
+        appendLsLong(visible(HOME, false));
+      } else {
+        appendLine('dim', 'already home.');
+      }
+      appendSpacer();
+      scrollBottom();
+      return;
+    }
+    if (tgt === '..') { goUp(); return; }
+    openName(tgt);
+    return;
+  }
+
+  if (head === 'tree') {
+    appendLine('mid', asciiTree(cwd));
+    appendSpacer();
+    scrollBottom();
+    return;
+  }
+
+  if (head === 'help' || head === '?') {
+    appendLine('mid', [
+      '  ls [-a] [-l]    list',
+      '  cat <name>      print a file',
+      '  cd  <name>      open / enter',
+      '  cd  ..          go up',
+      '  tree            show all',
+      '  search <query>  brave search',
+      '  whoami · pwd · clear',
+      "  exit            (please don't)",
+      '',
+      '  or just click any name.',
+    ].join('\n'));
+    appendSpacer();
+    scrollBottom();
+    return;
+  }
+
+  if (head === 'search' || head === 's') {
+    const query = rest.join(' ').trim();
+    if (!query) {
+      appendLine('dim', 'usage: search <query>');
+      appendSpacer(); scrollBottom(); return;
+    }
+    const container = document.createElement('div');
+    const status = document.createElement('div');
+    status.className = 'term-line dim';
+    status.textContent = 'searching_';
+    container.appendChild(status);
+    scrollEl.appendChild(container);
+    appendSpacer();
+    scrollBottom();
+    fetch('https://winter-dream-e43b.holmquist-carl.workers.dev/?q=' + encodeURIComponent(query), {
+      headers: { Accept: 'application/json' },
+    })
+      .then(r => r.json())
+      .then(data => {
+        container.innerHTML = '';
+        const items = data?.web?.results ?? [];
+        if (!items.length) {
+          const msg = document.createElement('div');
+          msg.className = 'term-line dim';
+          msg.textContent = 'no results for "' + query + '"';
+          container.appendChild(msg);
+        } else {
+            const block = document.createElement('div');
+          block.className = 'ls-block';
+          const total = document.createElement('div');
+          total.className = 'term-line dim';
+          total.textContent = 'total ' + items.length;
+          block.appendChild(total);
+          items.forEach(item => {
+            let domain = '—';
+            try { domain = new URL(item.url).hostname.replace(/^www\./, ''); } catch {}
+
+            const row = document.createElement('a');
+            row.href = item.url;
+            row.target = '_blank';
+            row.rel = 'noopener noreferrer';
+            row.className = 'ls-row type-link';
+            row.style.gridTemplateColumns = '100px 160px 1fr';
+            row.innerHTML =
+              `<span>lrwxr-xr-x</span>` +
+              `<span style="color:var(--text-mid);overflow:hidden;text-overflow:ellipsis">${esc(domain)}</span>` +
+              `<span class="name" style="overflow:hidden;text-overflow:ellipsis">${esc(item.title)} →</span>`;
+            block.appendChild(row);
+          });
+          container.appendChild(block);
+        }
+        scrollBottom();
+      })
+      .catch(() => {
+        container.innerHTML = '';
+        const msg = document.createElement('div');
+        msg.className = 'term-line dim';
+        msg.textContent = 'error fetching results';
+        container.appendChild(msg);
+        scrollBottom();
+      });
+    return;
+  }
+
+  if (head === 'whoami') {
+    appendLine('mid', 'carl holmquist. a stranger, otherwise.');
+    appendSpacer(); scrollBottom(); return;
+  }
+  if (head === 'pwd') {
+    appendLine('mid', cwd.replace('~', '/home/carl'));
+    appendSpacer(); scrollBottom(); return;
+  }
+  if (head === 'clear') {
+    scrollEl.innerHTML = '';
+    scrollBottom(); return;
+  }
+  if (head === 'exit' || head === 'logout') {
+    appendLine('dim', "you can't leave. you can only minimise the tab.");
+    appendSpacer(); scrollBottom(); return;
+  }
+  if (head === 'sudo') {
+    appendLine('dim', 'nice try.');
+    appendSpacer(); scrollBottom(); return;
+  }
+  if (head === 'rm') {
+    appendLine('dim', "i'd rather you didn't.");
+    appendSpacer(); scrollBottom(); return;
+  }
+  if (head === 'echo') {
+    appendLine('mid', rest.join(' '));
+    appendSpacer(); scrollBottom(); return;
+  }
+  if (head === 'date') {
+    appendLine('mid', new Date().toString());
+    appendSpacer(); scrollBottom(); return;
+  }
+  if (head === 'hej' || head === 'hi' || head === 'hello') {
+    appendLine('mid', 'hej. ' + (Math.random() < 0.5 ? '☕' : ''));
+    appendSpacer(); scrollBottom(); return;
+  }
+
+  appendLine('dim', 'command not found: ' + head + '. try `help`.');
+  appendSpacer();
+  scrollBottom();
+}
+
+// ---------- input ----------
+inputEl.addEventListener('input', () => {
+  ghostEl.textContent = inputEl.value;
+});
+
+function hideHint() {
+  const hint = document.getElementById('hint-enter');
+  if (hint) hint.style.display = 'none';
+}
+
+inputEl.addEventListener('keydown', e => {
+  // If pre-fill is active and user types a printable character, clear it so they start fresh
+  if (prefillActive && e.key.length === 1 && !e.ctrlKey && !e.metaKey && e.key !== 'Enter') {
+    prefillActive = false;
+    inputEl.value = '';
+    ghostEl.textContent = '';
+  }
+  if (e.key !== 'Tab') hideHint();
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const v = inputEl.value;
+    inputEl.value = '';
+    ghostEl.textContent = '';
+    if (v.trim()) history.push(v);
+    histIdx = -1;
+    const wasFirst = firstCommand;
+    firstCommand = false;
+    prefillActive = false;
+    run(v);
+    if (wasFirst) {
+      appendSpacer();
+      appendPromptEcho('~', 'ls');
+      appendLsLong(visible(HOME, false));
+      appendSpacer();
+      scrollBottom();
+    }
+    return;
+  }
+  if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (!history.length) return;
+    const next = histIdx === -1 ? history.length - 1 : Math.max(0, histIdx - 1);
+    histIdx = next;
+    inputEl.value = history[next];
+    ghostEl.textContent = history[next];
+    return;
+  }
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (histIdx === -1) return;
+    const next = histIdx + 1;
+    if (next >= history.length) {
+      histIdx = -1;
+      inputEl.value = '';
+      ghostEl.textContent = '';
+    } else {
+      histIdx = next;
+      inputEl.value = history[next];
+      ghostEl.textContent = history[next];
+    }
+    return;
+  }
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const parts = inputEl.value.split(/\s+/);
+    const last = parts[parts.length - 1] || '';
+    if (!last) return;
+    const matches = listAt(cwd).filter(f => f.name.startsWith(last));
+    if (matches.length === 1) {
+      parts[parts.length - 1] = matches[0].name + (matches[0].type === 'dir' ? '/' : '');
+      inputEl.value = parts.join(' ');
+      ghostEl.textContent = inputEl.value;
+    } else if (matches.length > 1) {
+      appendPromptEcho(cwd, inputEl.value + '<TAB>');
+      appendLine('dim', matches.map(m => m.name).join('   '));
+      appendSpacer();
+      scrollBottom();
+    }
+    return;
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+    e.preventDefault();
+    scrollEl.innerHTML = '';
+    return;
+  }
+  if (e.key === 'Escape' && manEl.style.display !== 'none') {
+    closeMan();
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && manEl.style.display !== 'none') {
+    closeMan();
+  }
+});
+
+document.addEventListener('click', e => {
+  if (e.target.closest('a, button, input, textarea')) return;
+  inputEl.focus({ preventScroll: true });
+});
+
+if (helpBtn) {
+  helpBtn.addEventListener('click', () => {
+    run('help');
+    inputEl.focus({ preventScroll: true });
+  });
+}
+
+// ---------- boot ----------
+function boot() {
+  const now = new Date();
+  const loginTime = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
+    ', ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) + '.';
+  appendLine('dim', '> last login: ' + loginTime);
+  appendLine('dim', '> 4 sections · 1 archive · welcome.');
+  appendSpacer();
+  updateFooter();
+  inputEl.value = 'cat .intro';
+  ghostEl.textContent = 'cat .intro';
+  inputEl.focus({ preventScroll: true });
+}
+
+boot();
+
+})();
+</script>

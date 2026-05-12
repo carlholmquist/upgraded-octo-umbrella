@@ -3,142 +3,156 @@ import DarkLayout from "../layouts/DarkLayout.astro";
 import photoPaths from "../data/photos.json";
 
 const cloudName = "drey6ump8";
-const photos = [...photoPaths]
-  .sort(() => Math.random() - 0.5)
-  .map((path: string) => ({ path }));
 
 function thumb(path: string) {
   return `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto,w_800/${path}`;
 }
-
 function full(path: string) {
   return `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto,w_1800/${path}`;
 }
+function displayName(path: string) {
+  const base = path.split('/').pop() ?? path;
+  return base.replace(/\.[^.]+$/, '').replace(/_[a-z0-9]{6}$/, '');
+}
+function extractYear(path: string) {
+  const m = path.match(/20\d\d/);
+  return m ? m[0] : '—';
+}
+
+const photos = (photoPaths as string[]).map((path, i) => ({
+  path,
+  name: displayName(path),
+  year: extractYear(path),
+  thumb: thumb(path),
+  full: full(path),
+  index: i,
+}));
 ---
 
-<DarkLayout title="Photography — Carl Holmquist" back pageLabel="Photographs" fullBleed fixedTheme={{ bg: "#f8f7f4", text: "24, 22, 18" }}>
-  <span slot="footer-left">holmquist.studio</span>
+<DarkLayout title="Photography — Carl Holmquist" back showClock>
+  <span slot="footer-left" id="foot-left">~/photography</span>
+  <span slot="footer-right">CLICK TO OPEN</span>
 
-  <div class="photo-list">
-    {photos.map((photo, i) => (
-      <button
-        class="photo-btn"
-        data-full={full(photo.path)}
-        data-index={i}
-        aria-label={photo.caption ?? `Photo ${i + 1}`}
-      >
-        <img
-          src={thumb(photo.path)}
-          alt={photo.caption ?? ""}
-          loading="lazy"
-          class="photo-img"
-        />
-        {photo.caption && <p class="photo-caption">{photo.caption}</p>}
-      </button>
-    ))}
-  </div>
+  <div id="scrollback">
+    <div class="term-line dim">&gt; photography · {photos.length} frames · click any to open</div>
+    <div class="spacer"></div>
 
-  <!-- Lightbox -->
-  <div
-    id="lightbox"
-    role="dialog"
-    aria-modal="true"
-  >
-    <button id="lightbox-close" class="lightbox-close" aria-label="Close">×</button>
-    <img id="lightbox-img" src="" alt="" class="lightbox-img" />
+    <div class="prompt-row">
+      <span class="prompt"><span class="user">carl</span><span class="at"> @ studio </span><span class="cwd">~/photography</span><span class="dollar"> $ </span></span>
+      <span class="echo-cmd">ls</span>
+    </div>
+
+    <div class="ls-block">
+      <div class="term-line dim">total {photos.length}</div>
+      {photos.map((photo) => (
+        <div
+          class="ls-row"
+          data-full={photo.full}
+          data-name={photo.name}
+          title={photo.name}
+        >
+          <span>-rw-r--r--</span>
+          <span>1</span>
+          <span>carl</span>
+          <span>—</span>
+          <span>{photo.year}</span>
+          <span class="name">{photo.name}</span>
+        </div>
+      ))}
+    </div>
+
+    <div class="spacer"></div>
   </div>
 
   <script>
-    const lightbox = document.getElementById("lightbox")!;
-    const lightboxImg = document.getElementById("lightbox-img") as HTMLImageElement;
-    const closeBtn = document.getElementById("lightbox-close")!;
+    const scrollback = document.getElementById('scrollback')!;
 
-    document.querySelectorAll<HTMLButtonElement>("[data-full]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        lightboxImg.src = btn.dataset.full!;
-        lightbox.classList.add("open");
-        document.body.style.overflow = "hidden";
-      });
-    });
-
-    function closeLightbox() {
-      lightbox.classList.remove("open");
-      lightboxImg.src = "";
-      document.body.style.overflow = "";
+    function appendSpacer() {
+      const d = document.createElement('div');
+      d.className = 'spacer';
+      scrollback.appendChild(d);
     }
 
-    closeBtn.addEventListener("click", closeLightbox);
-    lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLightbox(); });
+    function appendPromptEcho(cmd: string) {
+      const row = document.createElement('div');
+      row.className = 'prompt-row';
+      row.innerHTML =
+        `<span class="prompt"><span class="user">carl</span><span class="at"> @ studio </span><span class="cwd">~/photography</span><span class="dollar"> $ </span></span>` +
+        `<span class="echo-cmd">${cmd.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>`;
+      scrollback.appendChild(row);
+    }
+
+    function scrollBottom() {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    document.querySelectorAll<HTMLElement>('.ls-row[data-full]').forEach(row => {
+      row.addEventListener('click', () => {
+        const name = row.dataset.name!;
+        const src  = row.dataset.full!;
+
+        appendPromptEcho('open ' + name);
+
+        const wrap = document.createElement('div');
+        wrap.className = 'photo-inline';
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = name;
+        img.className = 'photo-img';
+        const cap = document.createElement('div');
+        cap.className = 'photo-cap term-line dim';
+        cap.textContent = name;
+        wrap.appendChild(img);
+        wrap.appendChild(cap);
+        scrollback.appendChild(wrap);
+
+        appendSpacer();
+        scrollBottom();
+      });
+    });
   </script>
 </DarkLayout>
 
 <style>
-  .photo-list {
-    columns: 3;
-    column-gap: 8px;
-    padding: 8px;
-    width: 100%;
-  }
+  :global(main) { max-width: 880px; }
 
-  .photo-btn {
-    display: block;
-    background: none;
-    border: none;
-    padding: 0;
-    margin-bottom: 8px;
-    break-inside: avoid;
-    cursor: zoom-in;
-    overflow: hidden;
-  }
+  .spacer { height: 12px; }
 
-  .photo-img {
-    width: 100%;
-    height: auto;
-    display: block;
-    filter: brightness(0.88);
-    transition: filter 300ms;
-  }
+  :global(.term-line) { white-space: pre-wrap; word-break: break-word; }
+  :global(.term-line.dim) { color: var(--text-dim); }
 
-  .photo-btn:hover .photo-img {
-    filter: brightness(1);
-  }
+  :global(.prompt-row) { display: flex; gap: 6px; align-items: baseline; }
+  :global(.prompt) { flex: 0 0 auto; color: var(--text-dim); }
+  :global(.prompt .user) { color: var(--text-mid); }
+  :global(.prompt .cwd)  { color: var(--text); }
+  :global(.prompt .at), :global(.prompt .dollar) { color: var(--text-dim); }
+  :global(.echo-cmd) { color: var(--text); }
 
-  .photo-caption { display: none; }
-
-  @media (max-width: 520px) {
-    .photo-list { columns: 1; }
-  }
-
-  #lightbox {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.95);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-  }
-  #lightbox.open { display: flex; }
-
-  .lightbox-close {
-    position: absolute;
-    top: 20px;
-    right: 24px;
-    background: none;
-    border: none;
-    color: rgba(226, 230, 232, 0.5);
-    font-size: 28px;
-    line-height: 1;
+  :global(.ls-block) { margin: 6px 0; }
+  :global(.ls-row) {
+    display: grid;
+    grid-template-columns: 100px 26px 46px 46px 80px 1fr;
+    gap: 14px;
+    padding: 0 6px;
+    border-radius: 2px;
+    color: var(--text-mid);
+    white-space: nowrap;
     cursor: pointer;
-    transition: color 275ms;
   }
-  .lightbox-close:hover { color: #e2e6e8; }
+  :global(.ls-row .name) { color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+  :global(.ls-row:hover) { background: var(--text); color: var(--bg); }
+  :global(.ls-row:hover span) { color: var(--bg); }
 
-  .lightbox-img {
-    max-height: 90vh;
-    max-width: 100%;
-    object-fit: contain;
+  :global(.photo-inline) { margin: 8px 0; max-width: 640px; }
+  :global(.photo-img) { width: 100%; height: auto; display: block; border: 1px solid var(--rule); }
+  :global(.photo-cap) { margin-top: 6px; font-size: 11px; letter-spacing: 0.08em; }
+
+  @media (max-width: 640px) {
+    :global(.ls-row) {
+      grid-template-columns: 60px 1fr;
+      gap: 14px;
+    }
+    :global(.ls-row span:not(:nth-child(5)):not(:nth-child(6))) { display: none; }
+    :global(.photo-inline) { max-width: 100%; }
   }
 </style>
