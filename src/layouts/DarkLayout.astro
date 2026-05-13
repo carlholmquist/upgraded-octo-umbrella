@@ -86,6 +86,8 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
   </head>
   <body>
 
+    <div class="crt-overlay" aria-hidden="true"></div>
+
     <header id="site-header">
       {back
         ? <a href={backHref} class="back-link">{backLabel}</a>
@@ -143,11 +145,40 @@ const fixedThemeJson = fixedTheme ? JSON.stringify(fixedTheme) : "null";
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  :global(img) { position: relative; z-index: 9999; }
+
+  /* CRT effects */
+  .crt-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    pointer-events: none;
+    /* scanlines */
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+  }
+  .crt-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* vignette */
+    background: radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(0, 0, 0, 0.55) 100%);
+  }
+
+  body {
+    /* phosphor glow — scales with each element's own text color */
+    text-shadow:
+      0 0 5px color-mix(in srgb, currentColor 50%, transparent),
+      0 0 14px color-mix(in srgb, currentColor 22%, transparent);
+  }
+
   body {
     background-color: var(--bg);
-    background-image: radial-gradient(circle, var(--dot) 1px, transparent 1px);
-    background-size: 22px 22px;
-    background-position: 0 0;
     color: var(--text);
     font-family: 'IBM Plex Mono', monospace;
     font-size: 13px;

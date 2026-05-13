@@ -21,6 +21,8 @@ const aboutData = {
   social: siteConfig.social,
 };
 
+const terminalData = siteConfig.terminal;
+
 const bookmarksData = siteConfig.Bookmarks.flatMap(cat =>
   (cat.links ?? []).map(link => ({
     label: link.label,
@@ -45,16 +47,16 @@ const photosData = (rawPhotos as string[]).map(path => ({
     <div id="scrollback"></div>
     <div class="prompt-row" id="prompt-live">
       <span class="prompt">
-        <span class="user">carl</span><span class="at"> @ studio </span><span id="prompt-cwd" class="cwd">~</span><span class="dollar"> $ </span>
+        <span class="user">carl</span><span class="at"> @ studio </span><span id="prompt-home" class="cwd cwd-home">~</span><span id="prompt-cwd-rest" class="cwd"></span><span class="dollar"> $ </span>
       </span>
       <span class="input-wrap"><span id="term-ghost" class="ghost"></span><span id="hint-enter" class="hint-enter">&nbsp;(hit enter)</span><input id="term-input" class="hidden-input" type="text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" /></span>
     </div>
   </div>
 
-  <article id="man-page" class="man" style="display:none;"></article>
   <script type="application/json" id="about-data" set:html={JSON.stringify(aboutData)} />
   <script type="application/json" id="photos-data" set:html={JSON.stringify(photosData)} />
   <script type="application/json" id="bookmarks-data" set:html={JSON.stringify(bookmarksData)} />
+  <script type="application/json" id="terminal-data" set:html={JSON.stringify(terminalData)} />
 </DarkLayout>
 
 <style>
@@ -75,6 +77,8 @@ const photosData = (rawPhotos as string[]).map(path => ({
   :global(.prompt) { flex: 0 0 auto; color: var(--text-dim); }
   :global(.prompt .user) { color: var(--text-mid); }
   :global(.prompt .cwd)  { color: var(--text); }
+  :global(.prompt .cwd-home) { cursor: pointer; }
+  :global(.prompt .cwd-home:hover) { text-decoration: underline; }
   :global(.prompt .at), :global(.prompt .dollar) { color: var(--text-dim); }
   :global(.echo-cmd) { color: var(--text); }
 
@@ -108,8 +112,11 @@ const photosData = (rawPhotos as string[]).map(path => ({
   :global(.ls-row .name) { color: var(--text); }
   :global(.ls-row.type-dir .name::after) { content: '/'; color: var(--text-dim); }
   :global(.ls-row.is-hidden .name) { color: var(--text-mid); }
-  :global(.ls-row:hover) { background: var(--text); color: var(--bg); }
+  :global(.ls-row:hover) { background: var(--text); color: var(--bg); box-shadow: 0 0 12px var(--text-mid), 0 0 32px var(--text-mid), 0 0 60px var(--text-dim); }
   :global(.ls-row:hover .name), :global(.ls-row:hover span) { color: var(--bg); }
+  :global(.ls-row:hover), :global(.ls-row:hover span) {
+    text-shadow: 0 0 5px var(--text-dim), 0 0 14px var(--text-dim);
+  }
 
   /* ls — compact */
   :global(.ls-compact) { display: flex; flex-wrap: wrap; gap: 0 28px; row-gap: 4px; }
@@ -140,44 +147,6 @@ const photosData = (rawPhotos as string[]).map(path => ({
   :global(.photo-inline img) { width: 100%; height: auto; display: block; border: 1px solid var(--rule); }
   :global(.photo-cap) { margin-top: 4px; }
 
-  /* manpage */
-  :global(.man) { max-width: 720px; margin: 0 auto; }
-  :global(.man-meta) {
-    display: flex; flex-wrap: wrap; gap: 24px; color: var(--text-dim);
-    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-    margin-bottom: 28px;
-  }
-  :global(.man-meta b) { color: var(--text-mid); font-weight: 400; }
-  :global(.man-title) {
-    font-size: 52px; line-height: 56px; font-weight: 300;
-    color: var(--text); letter-spacing: -0.02em; text-transform: lowercase;
-    margin-bottom: 12px;
-  }
-  :global(.man-sub) { color: var(--text-mid); max-width: 56ch; margin-bottom: 34px; }
-  :global(.man h3) {
-    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--text-dim); font-weight: 400; margin: 28px 0 10px;
-  }
-  :global(.man p) { color: var(--text-mid); max-width: 60ch; margin-bottom: 10px; }
-  :global(.man pre.figure) {
-    padding: 18px 20px; border: 1px solid var(--rule); margin: 22px 0;
-    color: var(--text-mid); line-height: 16px; font-size: 11px;
-    white-space: pre; overflow-x: auto;
-  }
-  :global(.man pre.figure .cap) {
-    display: block; margin-top: 10px; color: var(--text-dim);
-    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
-  }
-  :global(.man .links a) {
-    color: var(--text); text-decoration: none;
-    border-bottom: 1px solid var(--text-mid); margin-right: 18px;
-  }
-  :global(.man-foot) {
-    margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--rule);
-    color: var(--text-dim); display: flex; justify-content: space-between;
-  }
-  :global(.man-foot a) { color: var(--text-mid); text-decoration: none; }
-  :global(.man-foot a:hover) { color: var(--text); }
 
   @media (max-width: 640px) {
     /* Tighter horizontal padding */
@@ -204,10 +173,7 @@ const photosData = (rawPhotos as string[]).map(path => ({
     /* Photos full width */
     :global(.photo-inline) { max-width: 100%; }
 
-    /* Smaller man title */
-    :global(.man-title) { font-size: 28px; line-height: 34px; }
-
-    /* Footer: hide long hint text on small screens */
+/* Footer: hide long hint text on small screens */
     :global(.hint-desktop) { display: none; }
   }
 </style>
@@ -215,71 +181,81 @@ const photosData = (rawPhotos as string[]).map(path => ({
 <script is:inline>
 (function () {
 
-// ---------- about data ----------
-const ABOUT = JSON.parse(document.getElementById('about-data').textContent);
+// ---------- data ----------
+const ABOUT    = JSON.parse(document.getElementById('about-data').textContent);
+const TERMINAL = JSON.parse(document.getElementById('terminal-data').textContent);
+
+// ---------- about sub-files (built from config) ----------
+const ABOUT_FILES = (() => {
+  const a = ABOUT;
+  const slug = s => s.toLowerCase()
+    .replace(/[åäö]/g, c => ({å:'a',ä:'a',ö:'o'}[c]||c))
+    .replace(/[^a-z0-9]+/g, '-').replace(/-$/, '');
+  const files = [];
+  files.push({ name: 'bio', type: 'file', hidden: false,
+    perms: '-rw-r--r--', size: '—', year: '—', cat: a.aboutMe });
+  if (a.skills?.length) files.push({ name: 'skills', type: 'file', hidden: false,
+    perms: '-rw-r--r--', size: '—', year: '—', cat: a.skills.join('\n') });
+  a.experience?.forEach(e => files.push({ name: slug(e.company), type: 'file', hidden: e.hidden ?? false,
+    perms: '-rw-r--r--', size: '—', year: e.dateRange.split(/[–-]/)[0].trim(),
+    cat: e.title + '  ·  ' + e.dateRange + '\n\n' + e.bullets.join('\n') }));
+  a.education?.forEach(e => files.push({ name: slug(e.school), type: 'file', hidden: e.hidden ?? false,
+    perms: '-rw-r--r--', size: '—', year: e.dateRange.split(/[–-]/)[0].trim(),
+    cat: e.degree + '  ·  ' + e.dateRange + (e.achievements?.length ? '\n\n' + e.achievements.join('\n') : '') }));
+  const links = [
+    a.social?.email    && { label: 'email',    href: 'mailto:' + a.social.email },
+    a.social?.linkedin && { label: 'linkedin', href: a.social.linkedin },
+    a.social?.github   && { label: 'github',   href: a.social.github },
+  ].filter(Boolean);
+  if (links.length) files.push({ name: 'links', type: 'file', hidden: false,
+    perms: '-rw-r--r--', size: '—', year: '—', links });
+  return files;
+})();
+
+// ---------- project directories (built from config) ----------
+const PROJECT_FILE_MAP = {};
+const PROJECTS_CONFIG = ABOUT.projects ?? [];
+
+PROJECTS_CONFIG.forEach(proj => {
+  const slug = proj.slug || proj.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const year = proj.year || '—';
+  const files = [];
+  files.push({ name: 'README', type: 'file', hidden: false, perms: '-rw-r--r--', size: '—', year, cat: proj.description });
+  (proj.files ?? []).forEach(f => {
+    files.push({ name: f.name, type: 'file', hidden: false, perms: '-rw-r--r--', size: '—', year, cat: f.content });
+  });
+  const linkRows = proj.links?.length ? proj.links : (proj.link ? [{ label: proj.name, href: proj.link }] : []);
+  if (linkRows.length) files.push({ name: 'links', type: 'file', hidden: false, perms: '-rw-r--r--', size: '—', year, links: linkRows });
+  PROJECT_FILE_MAP[slug] = files;
+});
 
 // ---------- filesystem ----------
 const HOME = [
   {
     name: '.intro', type: 'file', hidden: true,
     perms: '-rw-r--r--', size: '0.3k', year: '2026',
-    cat: "hej.\n\ni'm carl. engineer. i build things and take photos.\ninterested in structures, tools, and making things work.\nhouston, tx (from sweden).",
+    cat: TERMINAL.intro,
+    links: [
+      ABOUT.social?.email    && { label: 'email',    href: 'mailto:' + ABOUT.social.email },
+      ABOUT.social?.linkedin && { label: 'linkedin', href: ABOUT.social.linkedin },
+      ABOUT.social?.github   && { label: 'github',   href: ABOUT.social.github },
+    ].filter(Boolean),
   },
   {
     name: 'README', type: 'file', hidden: false,
     perms: '-rw-r--r--', size: '0.2k', year: '2026',
-    cat: "this is a small terminal you can poke around in.\ntype `ls` or `help`, or just click any name below.\n`ls -a` shows the rest.",
+    cat: TERMINAL.readme,
   },
-  (function() {
-    const a = ABOUT;
-    const sections = [];
-    sections.push({ h: 'about', p: a.aboutMe.split('\n\n').filter(Boolean) });
-    if (a.skills?.length) sections.push({ h: 'skills', p: [a.skills.join('  ·  ')] });
-    a.experience?.forEach(e => {
-      sections.push({ h: e.company, p: [e.title + '  ·  ' + e.dateRange, ...e.bullets] });
-    });
-    a.education?.forEach(e => {
-      sections.push({ h: e.school, p: [e.degree + '  ·  ' + e.dateRange, ...(e.achievements ?? [])] });
-    });
-    a.projects?.forEach(p => {
-      sections.push({ h: p.name, p: [p.description] });
-    });
-    const links = [];
-    if (a.social?.email) links.push({ label: 'email', href: 'mailto:' + a.social.email });
-    if (a.social?.linkedin) links.push({ label: 'linkedin', href: a.social.linkedin });
-    if (a.social?.github) links.push({ label: 'github', href: a.social.github });
-    return {
-      name: 'about', type: 'work', hidden: false, inline: true,
-      perms: 'drwxr-xr-x', size: '—', year: '—',
-      title: 'about', kind: 'biography · cv', status: 'always wip',
-      stack: 'sweden → houston, tx',
-      blurb: a.aboutMe.split('\n\n')[0].slice(0, 120) + '…',
-      sections, links,
-    };
-  })(),
-  {
-    name: 'photography', type: 'dir', hidden: false,
-    perms: 'drwxr-xr-x', size: '—', year: '2018–',
-  },
-  {
-    name: 'bookmarks', type: 'dir', hidden: false,
-    perms: 'drwxr-xr-x', size: '—', year: '—',
-  },
-  {
-    name: 'heatmap', type: 'link', hidden: false,
-    perms: 'lrwxr-xr-x', size: '—', year: '2025',
-    title: 'heatmap', kind: 'visualization · external',
-    blurb: "where i've been, lately.",
-    href: '/heatmap',
-  },
-  {
-    name: 'projects', type: 'dir', hidden: false,
-    perms: 'drwxr-xr-x', size: '—', year: '2022–',
-  },
+  { name: 'about',       type: 'dir',  hidden: false, perms: 'drwxr-xr-x', size: '—', year: '—' },
+  { name: 'photography', type: 'dir',  hidden: false, perms: 'drwxr-xr-x', size: '—', year: '2018–' },
+  { name: 'bookmarks',   type: 'dir',  hidden: false, perms: 'drwxr-xr-x', size: '—', year: '—' },
+  { name: 'heatmap',     type: 'dir',  hidden: false, perms: 'drwxr-xr-x', size: '—', year: '2025',
+    ascii: 'https://studiobackend.onrender.com/geojson' },
+  { name: 'projects',    type: 'dir',  hidden: false, perms: 'drwxr-xr-x', size: '—', year: '2022–' },
   {
     name: '.colophon', type: 'file', hidden: true,
     perms: '-rw-r--r--', size: '0.2k', year: '2026',
-    cat: "set in IBM Plex Mono. dot grid is 22px.\nno analytics. no cookies. theme is random per visit.\nbuilt late at night.",
+    cat: TERMINAL.colophon,
   },
 ];
 
@@ -287,63 +263,12 @@ const PROJECTS = [
   {
     name: 'README', type: 'file', hidden: false,
     perms: '-rw-r--r--', size: '0.4k', year: '2026',
-    cat: "hi.\n\nthis is a small archive of things i've made.\nnothing here is finished. type `help` for commands,\nor click any name to open it. `ls -a` shows the rest.",
+    cat: "this is a small archive of things i've made.\nclick any directory to open it, or type `help`.\n`ls -a` shows the rest.",
   },
-  {
-    name: 'ghost', type: 'app', hidden: false,
-    perms: 'drwxr-xr-x', size: '2.3k', year: '2025',
-    title: 'ghost', kind: 'application · ios', status: 'live',
-    stack: 'swift · core location · sqlite',
-    blurb: 'a location timeline that quietly logs where you have been, so you can re-read your year as geography.',
-    sections: [
-      { h: 'why', p: [
-        "i wanted a notebook for places, not for words. something that runs in the background, never asks for input, and gives me a quiet map of a year — every café, every detour, every two-hour walk that i forget i took.",
-      ]},
-      { h: 'how', p: [
-        "significant-location updates on ios, batched to disk, replayed into a tile renderer. no servers. no accounts. export to gpx when you want to take your year with you.",
-      ]},
-    ],
-    figure: "┌──────────────────────────────────────────────────┐\n│  · · · · · · · · ·  ●─────●                      │\n│  · · · · · · ●─────●     │                       │\n│  · · · · ●───●           │                       │\n│  · · · · │               ●──────●                │\n│  · · · · ●─────●                │                │\n│                                 ●──● · · · · · · │\n└──────────────────────────────────────────────────┘\n   STOCKHOLM · 14 OCT · 9 PINGS",
-    figureCap: 'FIG. 01 · ONE DAY, RENDERED FROM ~150 PINGS',
-    links: [{ label: 'ghost.app', href: '#' }, { label: 'github', href: '#' }],
-  },
-  {
-    name: 'wood', type: 'thesis', hidden: false,
-    perms: 'drwxr-xr-x', size: '128k', year: '2023',
-    title: 'on the anisotropy of solid wood', kind: 'master thesis', status: 'archived',
-    stack: 'python · abaqus · 24 specimens',
-    blurb: 'a bench-and-model study of how solid wood deforms when its moisture content swings, and a small toolchain for predicting warp from species and cut.',
-    sections: [
-      { h: 'thesis', p: [
-        "wood is anisotropic and hygroscopic. that is two boring words for a quiet kind of magic: a flat board, left in a different room for a week, will cup or twist or split. cabinetmakers have known this for a thousand years; engineers model it badly.",
-        "i spent a year poking at small specimens of picea abies and quercus robur, watching them shrink between 12% and 6% moisture content, trying to predict — from species, cut and grain angle — which way they would move.",
-      ]},
-      { h: 'result', p: [
-        "a finite-element model that gets within ~14% of measured deformation on flatsawn boards, and within ~22% on quartersawn. a short paper, a long appendix, and an enormous respect for whoever made the chair you are sitting on.",
-      ]},
-    ],
-    figure: "┌──────────────────────────────────────────────────┐\n│ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │\n│ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │\n│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  │\n│  ↑ tangential          →  longitudinal           │\n└──────────────────────────────────────────────────┘\n   PICEA ABIES · 12% MC → 6% MC · n=24",
-    figureCap: 'FIG. 02 · SHRINKAGE BY GRAIN ORIENTATION',
-    links: [{ label: 'thesis.pdf', href: '#' }, { label: 'data', href: '#' }],
-  },
-  {
-    name: 'things', type: 'work', hidden: false,
-    perms: 'drwxr-xr-x', size: '∞', year: '2022–',
-    title: 'things, made', kind: 'workshop · ongoing', status: 'open',
-    stack: 'ash · oak · linseed oil · patience',
-    blurb: 'furniture and small objects built in a one-room workshop in stockholm. stools, shelves, a folding desk, a lamp that did not work.',
-    sections: [
-      { h: 'inventory', p: [
-        "three stools (ash, splayed legs, mortise-and-tenon). one shelf (oak, dadoed, two coats of hardwax oil). one folding desk (birch ply, the hinges are wrong, i am redoing it). one lamp (failed, the cord melted, do not ask).",
-      ]},
-      { h: 'notes', p: [
-        "most of what i make is too thick. i am working on this. joinery first, finish second; if the joinery is honest the finish does not need to lie.",
-      ]},
-    ],
-    figure: "┌──────────────────────────────────────────────────┐\n│         ┌──────┐                                 │\n│        ╱ stool ╱│        ┌────────────┐          │\n│       ┌──────┐ │         │   shelf    │          │\n│       │      │/          └────────────┘          │\n│       └──────┘                                   │\n│                          ┌──┐ ┌──┐               │\n│                          │  │ │  │  desk         │\n└──────────────────────────────────────────────────┘",
-    figureCap: 'FIG. 03 · INVENTORY · 2022 → NOW',
-    links: [{ label: 'photos', href: '#' }],
-  },
+  ...PROJECTS_CONFIG.map(proj => ({
+    name: proj.slug || proj.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+    type: 'dir', hidden: proj.hidden ?? false, perms: 'drwxr-xr-x', size: '—', year: proj.year || '—',
+  })),
   {
     name: '.well-hidden', type: 'file', hidden: true,
     perms: '-rw-------', size: '0.0k', year: '????',
@@ -363,15 +288,19 @@ const BOOKMARKS = JSON.parse(document.getElementById('bookmarks-data').textConte
 }));
 
 // ---------- photos ----------
-const PHOTOS = JSON.parse(document.getElementById('photos-data').textContent).map(p => ({
-  name: p.name,
-  type: 'photo',
-  hidden: false,
-  perms: '-rw-r--r--',
-  size: '—',
-  year: p.year,
-  full: p.full,
-}));
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const PHOTOS = shuffle(JSON.parse(document.getElementById('photos-data').textContent).map(p => ({
+  name: p.name, type: 'photo', hidden: false,
+  perms: '-rw-r--r--', size: '—', year: p.year, full: p.full,
+})));
 
 // ---------- state ----------
 let cwd = '~';
@@ -385,8 +314,8 @@ const termEl    = document.getElementById('term');
 const scrollEl  = document.getElementById('scrollback');
 const inputEl   = document.getElementById('term-input');
 const ghostEl   = document.getElementById('term-ghost');
-const cwdEl     = document.getElementById('prompt-cwd');
-const manEl     = document.getElementById('man-page');
+const promptHomeEl = document.getElementById('prompt-home');
+const promptRestEl = document.getElementById('prompt-cwd-rest');
 const footLeft  = document.getElementById('foot-left');
 const helpBtn   = document.getElementById('help-btn');
 
@@ -400,7 +329,9 @@ function esc(s) {
 
 function listAt(path) {
   if (path === '~') return HOME;
+  if (path === '~/about') return ABOUT_FILES;
   if (path === '~/projects') return PROJECTS;
+  if (path.startsWith('~/projects/')) return PROJECT_FILE_MAP[path.slice('~/projects/'.length)] ?? [];
   if (path === '~/photography') return PHOTOS;
   if (path === '~/bookmarks') return BOOKMARKS;
   return [];
@@ -408,6 +339,13 @@ function listAt(path) {
 
 function findEntry(path, name) {
   return listAt(path).find(e => e.name === name);
+}
+
+function openFrom(fromPath, name) {
+  const savedCwd = cwd;
+  cwd = fromPath;
+  openName(name);
+  if (cwd === fromPath) cwd = savedCwd;
 }
 
 function visible(entries, showHidden) {
@@ -418,34 +356,77 @@ function asciiTree(cwdPath) {
   if (cwdPath === '~') return [
     "~",
     "├── README",
-    "├── about",
+    "├── about/",
+    "│   ├── bio",
+    "│   ├── skills",
+    "│   └── links",
     "├── photography/",
     "├── bookmarks/",
-    "├── heatmap      →",
+    "├── heatmap →",
     "├── projects/",
-    "│   ├── README",
-    "│   ├── ghost",
-    "│   ├── wood",
-    "│   └── things",
+    "│   ├── ghost/",
+    "│   ├── wood/",
+    "│   └── things/",
     "└── (2 hidden)",
   ].join('\n');
-  return [
+  if (cwdPath === '~/projects') return [
     "~/projects",
     "├── README",
-    "├── ghost",
-    "├── wood",
-    "├── things",
+    "├── ghost/",
+    "│   ├── README · why · how · links",
+    "├── wood/",
+    "│   ├── README · thesis · result · links",
+    "├── things/",
+    "│   ├── README · inventory · notes",
     "└── (1 hidden)",
   ].join('\n');
+  return listAt(cwdPath).filter(e => !e.hidden)
+    .map((e, i, a) => (i === a.length - 1 ? '└── ' : '├── ') + e.name + (e.type === 'dir' ? '/' : ''))
+    .join('\n');
+}
+
+function resolvePath(from, rel) {
+  if (!rel || rel === '.' ) return from;
+  if (rel === '~' || rel === '/') return '~';
+  if (rel.startsWith('~/')) return rel.replace(/\/+$/, '') || '~';
+  const parts = from.split('/');
+  for (const seg of rel.replace(/\/+$/, '').split('/')) {
+    if (!seg || seg === '.') continue;
+    if (seg === '..') { if (parts.length > 1) parts.pop(); }
+    else parts.push(seg);
+  }
+  return parts.join('/') || '~';
 }
 
 function scrollBottom() {
+  const vv = window.visualViewport;
+  const promptEl = document.getElementById('prompt-live');
+  if (vv && promptEl && vv.height < window.innerHeight - 80) {
+    // Keyboard is open — scroll so prompt sits just above it
+    requestAnimationFrame(() => {
+      const rect = promptEl.getBoundingClientRect();
+      const visibleBottom = vv.offsetTop + vv.height;
+      if (rect.bottom > visibleBottom - 8) {
+        window.scrollBy({ top: rect.bottom - visibleBottom + 8, behavior: 'smooth' });
+      }
+    });
+    return;
+  }
   window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 }
 
 function updateFooter() {
   if (footLeft) footLeft.textContent = cwd.toUpperCase();
-  if (cwdEl) cwdEl.textContent = cwd;
+  if (promptRestEl) promptRestEl.textContent = cwd === '~' ? '' : cwd.slice(1);
+}
+
+// ---------- command hint ----------
+function cmdHint(r) {
+  if (r.type === 'dir' && (r.embed || r.ascii)) return 'open';
+  if (r.type === 'dir') return 'cd';
+  if (r.type === 'file') return 'cat';
+  if (r.type === 'link' || r.type === 'bookmark' || r.type === 'photo') return 'open';
+  return 'open';
 }
 
 // ---------- dom builders ----------
@@ -481,6 +462,7 @@ function scrollToEl(el) {
 }
 
 function appendLsLong(rows) {
+  const renderPath = cwd;
   const block = document.createElement('div');
   block.className = 'ls-block';
   const total = document.createElement('div');
@@ -494,17 +476,18 @@ function appendLsLong(rows) {
     row.innerHTML =
       `<span>${esc(r.perms)}</span>` +
       `<span>1</span>` +
-      `<span>m</span>` +
+      `<span>${cmdHint(r)}</span>` +
       `<span>${esc(r.size)}</span>` +
       `<span>${esc(r.year)}</span>` +
       `<span class="name">${esc(r.name)}${r.type === 'link' ? ' →' : ''}</span>`;
-    row.addEventListener('click', () => openName(r.name));
+    row.addEventListener('click', () => openFrom(renderPath, r.name));
     block.appendChild(row);
   });
   scrollEl.appendChild(block);
 }
 
 function appendLsCompact(rows) {
+  const renderPath = cwd;
   const block = document.createElement('div');
   block.className = 'ls-block';
   const wrap = document.createElement('div');
@@ -513,7 +496,7 @@ function appendLsCompact(rows) {
     const span = document.createElement('span');
     span.className = 'item' + (r.type === 'dir' ? ' dir' : '') + (r.hidden ? ' hidden' : '');
     span.textContent = r.name + (r.type === 'link' ? ' →' : '');
-    span.addEventListener('click', () => openName(r.name));
+    span.addEventListener('click', () => openFrom(renderPath, r.name));
     wrap.appendChild(span);
   });
   block.appendChild(wrap);
@@ -521,6 +504,7 @@ function appendLsCompact(rows) {
 }
 
 function appendLsNav(rows) {
+  const renderPath = cwd;
   const block = document.createElement('div');
   block.className = 'ls-block';
   const nav = document.createElement('div');
@@ -531,7 +515,7 @@ function appendLsNav(rows) {
     row.innerHTML =
       `<span class="ls-nav-idx">${String(i + 1).padStart(3, '0')}</span>` +
       `<span class="ls-nav-name">${esc(r.name)}${r.type === 'dir' ? '/' : ''}${r.type === 'link' ? ' →' : ''}</span>`;
-    row.addEventListener('click', () => openName(r.name));
+    row.addEventListener('click', () => openFrom(renderPath, r.name));
     nav.appendChild(row);
   });
   block.appendChild(nav);
@@ -545,18 +529,25 @@ function appendLs(rows, mode) {
   else appendLsLong(rows);
 }
 
-function appendPhotoGallery(rows) {
+const PHOTO_PAGE = 10;
+
+function appendPhotoGallery(rows, startIdx = 0) {
   const block = document.createElement('div');
   block.className = 'ls-block photo-gallery';
-  const total = document.createElement('div');
-  total.className = 'term-line dim';
-  total.textContent = 'total ' + rows.length;
-  block.appendChild(total);
-  rows.forEach(r => {
+
+  if (startIdx === 0) {
+    const total = document.createElement('div');
+    total.className = 'term-line dim';
+    total.textContent = 'total ' + rows.length;
+    block.appendChild(total);
+  }
+
+  const page = rows.slice(startIdx, startIdx + PHOTO_PAGE);
+  page.forEach(r => {
     const row = document.createElement('div');
     row.className = 'ls-row type-photo';
     row.innerHTML =
-      `<span>${esc(r.perms)}</span><span>1</span><span>carl</span>` +
+      `<span>${esc(r.perms)}</span><span>1</span><span>open</span>` +
       `<span>${esc(r.size)}</span><span>${esc(r.year)}</span>` +
       `<span class="name">${esc(r.name)}</span>`;
     block.appendChild(row);
@@ -569,6 +560,23 @@ function appendPhotoGallery(rows) {
     wrap.appendChild(img);
     block.appendChild(wrap);
   });
+
+  const nextIdx = startIdx + PHOTO_PAGE;
+  if (nextIdx < rows.length) {
+    const remaining = rows.length - nextIdx;
+    const loadMore = document.createElement('div');
+    loadMore.className = 'ls-row type-link load-more';
+    loadMore.innerHTML =
+      `<span>-rw-r--r--</span><span>·</span><span>·</span>` +
+      `<span>·</span><span>·</span><span class="name">load ${Math.min(PHOTO_PAGE, remaining)} more →</span>`;
+    loadMore.addEventListener('click', () => {
+      loadMore.remove();
+      appendPhotoGallery(rows, nextIdx);
+      scrollBottom();
+    });
+    block.appendChild(loadMore);
+  }
+
   scrollEl.appendChild(block);
 }
 
@@ -591,7 +599,7 @@ function appendBookmarkList(rows) {
     const row = document.createElement('div');
     row.className = 'ls-row type-bookmark';
     row.innerHTML =
-      `<span>${esc(r.perms)}</span><span>1</span><span>carl</span>` +
+      `<span>${esc(r.perms)}</span><span>1</span><span>open</span>` +
       `<span>${esc(r.size)}</span><span>${esc(r.year)}</span>` +
       `<span class="name">${esc(r.name)} →</span>`;
     row.style.cursor = 'pointer';
@@ -601,87 +609,153 @@ function appendBookmarkList(rows) {
   scrollEl.appendChild(block);
 }
 
-// ---------- inline manpage ----------
-function appendManInline(entry) {
-  const m = entry;
+// ---------- links renderer ----------
+function appendLinks(links) {
+  const block = document.createElement('div');
+  block.className = 'ls-block';
+  links.forEach(l => {
+    const a = document.createElement('a');
+    a.href = l.href;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.className = 'ls-row type-link';
+    a.innerHTML =
+      `<span>lrwxr-xr-x</span>` +
+      `<span>1</span>` +
+      `<span>open</span>` +
+      `<span>—</span>` +
+      `<span>—</span>` +
+      `<span class="name">${esc(l.label)} →</span>`;
+    block.appendChild(a);
+  });
+  scrollEl.appendChild(block);
+}
 
-  // meta line
-  const metaParts = [m.kind, m.status, m.stack].filter(Boolean);
-  if (metaParts.length) appendLine('dim', metaParts.join('  ·  '));
-  appendSpacer();
+// ---------- ascii heatmap ----------
+async function appendAsciiHeatmap(url) {
+  const statusEl = document.createElement('div');
+  statusEl.className = 'term-line dim';
+  statusEl.textContent = 'fetching routes_';
+  scrollEl.appendChild(statusEl);
+  scrollBottom();
 
-  // sections
-  if (m.sections) {
-    m.sections.forEach((s, i) => {
-      const hdr = document.createElement('div');
-      hdr.style.cssText = 'display:inline-block;background:var(--text);color:var(--bg);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;padding:1px 6px;margin-bottom:8px;';
-      hdr.textContent = String(i + 1).padStart(2, '0') + ' / ' + s.h;
-      scrollEl.appendChild(hdr);
-      s.p.forEach(para => appendLine('mid', para));
-      appendSpacer();
+  try {
+    const res = await fetch(url);
+    const geojson = await res.json();
+
+    const lines = [];
+    geojson.features.forEach(f => {
+      if (f.geometry.type === 'LineString') lines.push(f.geometry.coordinates);
     });
-  }
+    if (!lines.length) { statusEl.textContent = 'no route data'; return; }
 
-  // links
-  if (m.links?.length) {
-    const hdr = document.createElement('div');
-    hdr.style.cssText = 'display:inline-block;background:var(--text);color:var(--bg);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;padding:1px 6px;margin-bottom:8px;';
-    hdr.textContent = 'links';
-    scrollEl.appendChild(hdr);
-    const linkRow = document.createElement('div');
-    linkRow.style.cssText = 'display:flex;gap:18px;flex-wrap:wrap;';
-    m.links.forEach(l => {
-      const a = document.createElement('a');
-      a.href = l.href;
-      a.textContent = l.label + ' ↗';
-      a.style.cssText = 'color:var(--text);text-decoration:none;border-bottom:1px solid var(--text-mid);';
-      linkRow.appendChild(a);
+    // Focus on last coordinate of last route
+    const lastLine = lines[lines.length - 1];
+    const lastPt = lastLine[lastLine.length - 1]; // [lng, lat]
+    const cLng = lastPt[0], cLat = lastPt[1];
+
+    const HALF_LAT = 0.04;
+    const HALF_LNG = HALF_LAT / Math.cos(cLat * Math.PI / 180);
+    const minLat = cLat - HALF_LAT, maxLat = cLat + HALF_LAT;
+    const minLng = cLng - HALF_LNG, maxLng = cLng + HALF_LNG;
+    const dLat = maxLat - minLat, dLng = maxLng - minLng;
+
+    // Grid sized so chars fill a square: ROWS = COLS * charWidth/charHeight
+    const COLS = 74;
+    const ROWS = Math.round(COLS * (8 / 22)); // ~27 — square visual
+
+    const grid = Array.from({length: ROWS}, () => new Uint8Array(COLS));
+
+    function project([lng, lat]) {
+      const c = Math.round((lng - minLng) / dLng * (COLS - 1));
+      const r = Math.round((maxLat - lat) / dLat * (ROWS - 1));
+      return [Math.max(0, Math.min(COLS-1, c)), Math.max(0, Math.min(ROWS-1, r))];
+    }
+
+    function bresenham(x0, y0, x1, y1) {
+      const dx = Math.abs(x1-x0), dy = Math.abs(y1-y0);
+      const sx = x0<x1?1:-1, sy = y0<y1?1:-1;
+      let err = dx-dy;
+      for (let i=0; i<2000; i++) {
+        if (grid[y0][x0] < 255) grid[y0][x0]++;
+        if (x0===x1 && y0===y1) break;
+        const e2 = 2*err;
+        if (e2>-dy) { err-=dy; x0+=sx; }
+        if (e2<dx)  { err+=dx; y0+=sy; }
+      }
+    }
+
+    lines.forEach(coords => {
+      for (let i=0; i<coords.length-1; i++) {
+        const [c0,r0] = project(coords[i]);
+        const [c1,r1] = project(coords[i+1]);
+        bresenham(c0, r0, c1, r1);
+      }
     });
-    scrollEl.appendChild(linkRow);
+
+    let maxCount = 0;
+    grid.forEach(row => row.forEach(v => { if (v > maxCount) maxCount = v; }));
+
+    const rendered = grid.map(row =>
+      Array.from(row).map(v => {
+        if (v === 0) return ' ';
+        const t = v / maxCount;
+        if (t < 0.15) return '·';
+        if (t < 0.4)  return '+';
+        if (t < 0.7)  return '▪';
+        return '■';
+      }).join('')
+    ).join('\n');
+
+    // Reverse geocode last point for a location label
+    let locationLabel = '';
+    try {
+      const geo = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${cLat}&lon=${cLng}&format=json`,
+        { headers: { 'Accept-Language': 'en' } }
+      );
+      const geoData = await geo.json();
+      const a = geoData.address ?? {};
+      locationLabel = a.neighbourhood || a.suburb || a.city_district || a.town || a.city || '';
+      if (locationLabel && (a.city || a.town)) {
+        const city = a.city || a.town;
+        if (locationLabel !== city) locationLabel += ', ' + city;
+      }
+    } catch {}
+
+    function makeTopBorder(label, cols) {
+      const inner = label ? ' ' + label + ' ' : '';
+      const used = 2 + inner.length; // ┌ + inner + ... before ┐
+      const right = Math.max(0, cols - used);
+      return '┌─' + inner + '─'.repeat(right) + '┐';
+    }
+
+    const bar = '─'.repeat(COLS);
+    const boxed = makeTopBorder(locationLabel, COLS) + '\n'
+      + rendered.split('\n').map(r => '│' + r + '│').join('\n')
+      + '\n└' + bar + '┘';
+
+    statusEl.remove();
+    const out = document.createElement('div');
+    out.className = 'term-line mid';
+    out.style.cssText = 'white-space:pre;line-height:1.35;font-size:11px;';
+    out.textContent = boxed;
+    scrollEl.appendChild(out);
+
+    const meta = document.createElement('div');
+    meta.className = 'term-line dim';
+    meta.textContent = lines.length + ' routes · last known location · ' + COLS + '×' + ROWS;
+    scrollEl.appendChild(meta);
+
+    appendLinks([{ label: 'open full map', href: '/heatmap' }]);
+
     appendSpacer();
+    scrollBottom();
+  } catch(err) {
+    statusEl.textContent = 'error: could not load route data';
+    appendSpacer();
+    scrollBottom();
   }
-}
-
-// ---------- manpage ----------
-function showMan(entry) {
-  const m = entry;
-  let html = `<div class="man-meta">`;
-  html += `<span><b>name</b>&nbsp;&nbsp;${esc(m.name)}</span>`;
-  if (m.kind)   html += `<span><b>kind</b>&nbsp;&nbsp;${esc(m.kind)}</span>`;
-  if (m.year)   html += `<span><b>year</b>&nbsp;&nbsp;${esc(m.year)}</span>`;
-  if (m.status) html += `<span><b>status</b>&nbsp;&nbsp;${esc(m.status)}</span>`;
-  if (m.stack)  html += `<span><b>stack</b>&nbsp;&nbsp;${esc(m.stack)}</span>`;
-  html += `</div>`;
-  html += `<h1 class="man-title">${esc(m.title)}</h1>`;
-  if (m.blurb) html += `<p class="man-sub">${esc(m.blurb)}</p>`;
-  if (m.sections) {
-    m.sections.forEach((s, i) => {
-      html += `<section><h3>— ${String(i + 1).padStart(2, '0')} / ${esc(s.h)}</h3>`;
-      s.p.forEach(para => { html += `<p>${esc(para)}</p>`; });
-      html += `</section>`;
-    });
-  }
-  if (m.figure) {
-    html += `<pre class="figure">${esc(m.figure)}<span class="cap">${esc(m.figureCap || '')}</span></pre>`;
-  }
-  if (m.links) {
-    html += `<section class="links"><h3>— links</h3>`;
-    m.links.forEach(l => { html += `<a href="${esc(l.href)}">${esc(l.label)} ↗</a>`; });
-    html += `</section>`;
-  }
-  html += `<div class="man-foot"><a href="#" id="man-back">← cd ..</a><span>esc · ${esc(cwd)}</span></div>`;
-  manEl.innerHTML = html;
-  manEl.style.display = '';
-  termEl.style.display = 'none';
-  document.getElementById('man-back').addEventListener('click', e => { e.preventDefault(); closeMan(); });
-  scrollBottom();
-}
-
-function closeMan() {
-  manEl.style.display = 'none';
-  termEl.style.display = '';
-  setTimeout(() => inputEl.focus({ preventScroll: true }), 0);
-  scrollBottom();
 }
 
 // ---------- inline photo ----------
@@ -700,24 +774,26 @@ function appendInlinePhoto(entry) {
 }
 
 // ---------- open entry ----------
-function openName(name) {
+
+function openName(name, skipEcho) {
+  name = name.replace(/\/$/, '');
   const e = findEntry(cwd, name);
   if (!e) {
-    appendPromptEcho(cwd, 'open ' + name);
+    if (!skipEcho) appendPromptEcho(cwd, 'open ' + name);
     appendLine('dim', 'no such file or directory: ' + name);
     appendSpacer();
     scrollBottom();
     return;
   }
   if (e.type === 'photo') {
-    appendPromptEcho(cwd, 'open ' + name);
+    if (!skipEcho) appendPromptEcho(cwd, 'open ' + name);
     appendInlinePhoto(e);
     appendSpacer();
     scrollBottom();
     return;
   }
   if (e.type === 'bookmark') {
-    appendPromptEcho(cwd, 'open ' + name);
+    if (!skipEcho) appendPromptEcho(cwd, 'open ' + name);
     appendLine('mid', '→ ' + e.url);
     appendSpacer();
     scrollBottom();
@@ -725,22 +801,29 @@ function openName(name) {
     return;
   }
   if (e.type === 'file') {
-    appendPromptEcho(cwd, 'cat ' + name);
-    appendLine('mid', e.cat || '(empty)');
+    if (!skipEcho) appendPromptEcho(cwd, 'cat ' + name);
+    if (e.cat) appendLine('mid', e.cat);
+    if (e.links?.length) appendLinks(e.links);
+    if (!e.cat && !e.links?.length) appendLine('dim', '(empty)');
     appendSpacer();
     scrollBottom();
     return;
   }
   if (e.type === 'link') {
-    appendPromptEcho(cwd, 'open ' + name);
+    if (!skipEcho) appendPromptEcho(cwd, 'open ' + name);
     appendLine('mid', '→ ' + e.href);
     appendSpacer();
     scrollBottom();
     setTimeout(() => { window.location.href = e.href; }, 300);
     return;
   }
+  if (e.type === 'dir' && e.ascii) {
+    if (!skipEcho) appendPromptEcho(cwd, 'open ' + name);
+    appendAsciiHeatmap(e.ascii);
+    return;
+  }
   if (e.type === 'dir') {
-    appendPromptEcho(cwd, 'cd ' + name);
+    if (!skipEcho) appendPromptEcho(cwd, 'cd ' + name);
     cwd = cwd === '~' ? '~/' + name : cwd + '/' + name;
     updateFooter();
     appendSpacer();
@@ -753,22 +836,16 @@ function openName(name) {
     else scrollBottom();
     return;
   }
-  // app / thesis / work → manpage (inline or fullscreen)
-  const manEcho = appendPromptEcho(cwd, 'cd ' + name);
-  if (e.inline) {
-    appendManInline(e);
-    appendSpacer();
-    scrollToEl(manEcho);
-  } else {
-    scrollBottom();
-    setTimeout(() => showMan(e), 60);
-  }
+  if (!skipEcho) appendPromptEcho(cwd, 'open ' + name);
+  appendLine('dim', 'not sure how to open: ' + name);
+  appendSpacer();
+  scrollBottom();
 }
 
-function goUp() {
+function goUp(skipEcho) {
   if (cwd === '~') return;
   const parent = cwd.split('/').slice(0, -1).join('/') || '~';
-  appendPromptEcho(cwd, 'cd ..');
+  if (!skipEcho) appendPromptEcho(cwd, 'cd ..');
   cwd = parent;
   updateFooter();
   appendSpacer();
@@ -806,36 +883,61 @@ function run(raw) {
     const e = tgt ? findEntry(cwd, tgt) : null;
     if (!e) {
       appendLine('dim', 'cat: ' + (tgt || '(missing operand)') + ': no such file');
-    } else if (e.cat) {
-      appendLine('mid', e.cat);
-    } else if (e.blurb) {
-      appendLine('mid', e.blurb + (e.href ? '\n→ ' + e.href : ''));
+    } else if (e.cat || e.links?.length) {
+      if (e.cat) appendLine('mid', e.cat);
+      if (e.links?.length) appendLinks(e.links);
     } else {
-      appendLine('dim', e.name + ' is a ' + e.type + '. try `cd ' + e.name + '`.');
+      appendLine('dim', e.name + ': is a directory. try `cd ' + e.name + '`.');
     }
     appendSpacer();
     scrollBottom();
     return;
   }
 
-  if (head === 'cd' || head === 'open') {
+  if (head === 'cd') {
     const tgt = rest[0];
     if (!tgt || tgt === '~' || tgt === '/') {
       if (cwd !== '~') {
-        cwd = '~';
-        updateFooter();
-        appendSpacer();
+        cwd = '~'; updateFooter(); appendSpacer();
         appendPromptEcho('~', 'ls');
         appendLsLong(visible(HOME, false));
       } else {
         appendLine('dim', 'already home.');
       }
+      appendSpacer(); scrollBottom(); return;
+    }
+    const resolved = resolvePath(cwd, tgt);
+    if (resolved === '~') {
+      cwd = '~'; updateFooter(); appendSpacer();
+      appendPromptEcho('~', 'ls');
+      appendLsLong(visible(HOME, false));
+      appendSpacer(); scrollBottom(); return;
+    }
+    const parentPath = resolved.split('/').slice(0, -1).join('/') || '~';
+    const entryName = resolved.split('/').pop();
+    const entry = listAt(parentPath).find(e => e.name === entryName);
+    const dirEntries = listAt(resolved);
+    if (entry?.ascii) { appendAsciiHeatmap(entry.ascii); return; }
+    if (dirEntries.length || entry?.type === 'dir') {
+      cwd = resolved; updateFooter(); appendSpacer();
+      const lsEcho = appendPromptEcho(cwd, 'ls');
+      if (cwd === '~/photography') appendPhotoGallery(visible(listAt(cwd), false));
+      else if (cwd === '~/bookmarks') appendBookmarkList(visible(listAt(cwd), false));
+      else appendLsLong(visible(listAt(cwd), false));
       appendSpacer();
-      scrollBottom();
+      if (cwd === '~/photography' || cwd === '~/bookmarks') scrollToEl(lsEcho);
+      else scrollBottom();
       return;
     }
-    if (tgt === '..') { goUp(); return; }
-    openName(tgt);
+    if (entry) { cwd = parentPath; updateFooter(); openName(entryName, true); return; }
+    appendLine('dim', 'no such file or directory: ' + tgt);
+    appendSpacer(); scrollBottom(); return;
+  }
+
+  if (head === 'open') {
+    const tgt = rest[0];
+    if (!tgt) { appendLine('dim', 'open: missing operand'); appendSpacer(); scrollBottom(); return; }
+    openName(tgt.replace(/\/$/, ''), true);
     return;
   }
 
@@ -850,7 +952,7 @@ function run(raw) {
     appendLine('mid', [
       '  ls [-a] [-l]    list',
       '  cat <name>      print a file',
-      '  cd  <name>      open / enter',
+      '  cd  <name>      enter a directory',
       '  cd  ..          go up',
       '  tree            show all',
       '  search <query>  brave search',
@@ -1055,16 +1157,8 @@ inputEl.addEventListener('keydown', e => {
     scrollEl.innerHTML = '';
     return;
   }
-  if (e.key === 'Escape' && manEl.style.display !== 'none') {
-    closeMan();
-  }
 });
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && manEl.style.display !== 'none') {
-    closeMan();
-  }
-});
 
 document.addEventListener('click', e => {
   if (e.target.closest('a, button, input, textarea')) return;
@@ -1078,13 +1172,47 @@ if (helpBtn) {
   });
 }
 
+if (promptHomeEl) {
+  promptHomeEl.addEventListener('click', e => {
+    e.stopPropagation();
+    if (cwd === '~') return;
+    appendPromptEcho(cwd, 'cd ~');
+    cwd = '~';
+    updateFooter();
+    appendSpacer();
+    appendPromptEcho('~', 'ls');
+    appendLsLong(visible(HOME, false));
+    appendSpacer();
+    scrollBottom();
+    inputEl.focus({ preventScroll: true });
+  });
+}
+
+// ---------- mobile keyboard ----------
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    if (document.activeElement !== inputEl) return;
+    requestAnimationFrame(() => {
+      const promptEl = document.getElementById('prompt-live');
+      if (!promptEl) return;
+      const vv = window.visualViewport;
+      const rect = promptEl.getBoundingClientRect();
+      const visibleBottom = vv.offsetTop + vv.height;
+      if (rect.bottom > visibleBottom - 8) {
+        window.scrollBy({ top: rect.bottom - visibleBottom + 8, behavior: 'instant' });
+      }
+    });
+  });
+}
+
 // ---------- boot ----------
 function boot() {
   const now = new Date();
-  const loginTime = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
+  const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
     ', ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) + '.';
-  appendLine('dim', '> last login: ' + loginTime);
-  appendLine('dim', '> 4 sections · 1 archive · welcome.');
+  (TERMINAL.loginLines ?? []).forEach(line =>
+    appendLine('dim', line.replace('{date}', dateStr))
+  );
   appendSpacer();
   updateFooter();
   inputEl.value = 'cat .intro';
