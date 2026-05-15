@@ -72,6 +72,8 @@ const photosData = (rawPhotos as string[]).map(path => ({
   :global(.term-line) { white-space: pre-wrap; word-break: break-word; }
   :global(.term-line.dim) { color: var(--text-dim); }
   :global(.term-line.mid) { color: var(--text-mid); }
+  :global(.cat-bullet) { padding-left: 2ch; text-indent: -2ch; white-space: pre-wrap; word-break: break-word; }
+  :global(.cat-title) { color: var(--text); font-size: 1.6em; line-height: 2.25; letter-spacing: 0.04em; margin-bottom: 6px; }
 
   :global(.prompt-row) { display: flex; gap: 6px; align-items: baseline; color: var(--text-mid); }
   :global(.prompt) { flex: 0 0 auto; color: var(--text-dim); }
@@ -112,10 +114,10 @@ const photosData = (rawPhotos as string[]).map(path => ({
   :global(.ls-row .name) { color: var(--text); }
   :global(.ls-row.type-dir .name::after) { content: '/'; color: var(--text-dim); }
   :global(.ls-row.is-hidden .name) { color: var(--text-mid); }
-  :global(.ls-row:hover) { background: var(--text); color: var(--bg); box-shadow: 0 0 12px var(--text-mid), 0 0 32px var(--text-mid), 0 0 60px var(--text-dim); }
+  :global(.ls-row:hover) { background: var(--text); color: var(--bg); box-shadow: 0 0 8px var(--text-mid), 0 0 20px var(--text-dim); }
   :global(.ls-row:hover .name), :global(.ls-row:hover span) { color: var(--bg); }
   :global(.ls-row:hover), :global(.ls-row:hover span) {
-    text-shadow: 0 0 5px var(--text-dim), 0 0 14px var(--text-dim);
+    text-shadow: 0 0 4px var(--text-dim);
   }
 
   /* ls — compact */
@@ -198,10 +200,10 @@ const ABOUT_FILES = (() => {
     perms: '-rw-r--r--', size: '—', year: '—', cat: a.skills.join('\n') });
   a.experience?.forEach(e => files.push({ name: slug(e.company), type: 'file', hidden: e.hidden ?? false,
     perms: '-rw-r--r--', size: '—', year: e.dateRange.split(/[–-]/)[0].trim(),
-    cat: e.title + '  ·  ' + e.dateRange + '\n\n' + e.bullets.join('\n') }));
+    cat: e.title + '  ·  ' + e.dateRange + '\n\n' + e.bullets.map(b => '  · ' + b).join('\n') }));
   a.education?.forEach(e => files.push({ name: slug(e.school), type: 'file', hidden: e.hidden ?? false,
     perms: '-rw-r--r--', size: '—', year: e.dateRange.split(/[–-]/)[0].trim(),
-    cat: e.degree + '  ·  ' + e.dateRange + (e.achievements?.length ? '\n\n' + e.achievements.join('\n') : '') }));
+    cat: e.degree + '  ·  ' + e.dateRange + (e.achievements?.length ? '\n\n' + e.achievements.map(a => '  · ' + a).join('\n') : '') }));
   const links = [
     a.social?.email    && { label: 'email',    href: 'mailto:' + a.social.email },
     a.social?.linkedin && { label: 'linkedin', href: a.social.linkedin },
@@ -222,7 +224,13 @@ PROJECTS_CONFIG.forEach(proj => {
   const files = [];
   files.push({ name: 'README', type: 'file', hidden: false, perms: '-rw-r--r--', size: '—', year, cat: proj.description });
   (proj.files ?? []).forEach(f => {
-    files.push({ name: f.name, type: 'file', hidden: false, perms: '-rw-r--r--', size: '—', year, cat: f.content });
+    let blocks;
+    if (f.blocks) {
+      blocks = f.blocks;
+    } else {
+      blocks = [{ content: f.content, bullets: f.bullets }];
+    }
+    files.push({ name: f.name, type: 'file', hidden: f.hidden ?? false, perms: '-rw-r--r--', size: '—', year, blocks });
   });
   const linkRows = proj.links?.length ? proj.links : (proj.link ? [{ label: proj.name, href: proj.link }] : []);
   if (linkRows.length) files.push({ name: 'links', type: 'file', hidden: false, perms: '-rw-r--r--', size: '—', year, links: linkRows });
@@ -443,6 +451,80 @@ function appendLine(cls, text) {
   scrollEl.appendChild(d);
 }
 
+function appendCat(cls, text) {
+  const lines = text.split('\n');
+  const block = document.createElement('div');
+  block.className = 'term-line' + (cls ? ' ' + cls : '');
+  lines.forEach(line => {
+    const span = document.createElement('div');
+    if (/^  · /.test(line)) {
+      span.className = 'cat-bullet';
+      span.textContent = line.trimStart();
+    } else if (line === '') {
+      span.innerHTML = '&nbsp;';
+    } else {
+      span.textContent = line;
+    }
+    block.appendChild(span);
+  });
+  scrollEl.appendChild(block);
+}
+
+function appendBlocks(blocks) {
+  const wrap = document.createElement('div');
+  wrap.className = 'term-line mid';
+  blocks.forEach((b, i) => {
+    if (i > 0) {
+      const gap = document.createElement('div');
+      gap.innerHTML = '&nbsp;';
+      wrap.appendChild(gap);
+    }
+    if (b.title) {
+      const t = document.createElement('div');
+      t.className = 'cat-title';
+      t.textContent = b.title;
+      wrap.appendChild(t);
+    }
+    if (b.content) {
+      b.content.split('\n').forEach(line => {
+        const d = document.createElement('div');
+        if (line === '') { d.innerHTML = '&nbsp;'; } else { d.textContent = line; }
+        wrap.appendChild(d);
+      });
+    }
+    if (b.bullets?.length) {
+      if (b.content) {
+        const gap = document.createElement('div');
+        gap.innerHTML = '&nbsp;';
+        wrap.appendChild(gap);
+      }
+      b.bullets.forEach(bullet => {
+        const d = document.createElement('div');
+        d.className = 'cat-bullet';
+        d.textContent = '· ' + bullet;
+        wrap.appendChild(d);
+      });
+    }
+    if (b.photo) {
+      const photoWrap = document.createElement('div');
+      photoWrap.className = 'photo-inline';
+      const img = document.createElement('img');
+      img.src = b.photo;
+      img.alt = b.caption || '';
+      img.loading = 'lazy';
+      photoWrap.appendChild(img);
+      if (b.caption) {
+        const cap = document.createElement('div');
+        cap.className = 'photo-cap term-line dim';
+        cap.textContent = b.caption;
+        photoWrap.appendChild(cap);
+      }
+      wrap.appendChild(photoWrap);
+    }
+  });
+  scrollEl.appendChild(wrap);
+}
+
 function appendPromptEcho(cwdStr, cmd) {
   const row = document.createElement('div');
   row.className = 'prompt-row';
@@ -649,15 +731,27 @@ async function appendAsciiHeatmap(url) {
     });
     if (!lines.length) { statusEl.textContent = 'no route data'; return; }
 
-    // Focus on last coordinate of last route
+    // Fit viewport to last 10 routes' extent
     const lastLine = lines[lines.length - 1];
-    const lastPt = lastLine[lastLine.length - 1]; // [lng, lat]
-    const cLng = lastPt[0], cLat = lastPt[1];
+    const lastPt = lastLine[lastLine.length - 1];
+    const recentLines = lines.slice(-10);
 
-    const HALF_LAT = 0.04;
-    const HALF_LNG = HALF_LAT / Math.cos(cLat * Math.PI / 180);
-    const minLat = cLat - HALF_LAT, maxLat = cLat + HALF_LAT;
-    const minLng = cLng - HALF_LNG, maxLng = cLng + HALF_LNG;
+    let rMinLat = Infinity, rMaxLat = -Infinity, rMinLng = Infinity, rMaxLng = -Infinity;
+    recentLines.forEach(coords => coords.forEach(([lng, lat]) => {
+      if (lat < rMinLat) rMinLat = lat; if (lat > rMaxLat) rMaxLat = lat;
+      if (lng < rMinLng) rMinLng = lng; if (lng > rMaxLng) rMaxLng = lng;
+    }));
+
+    const cLat = (rMinLat + rMaxLat) / 2;
+    const cLng = (rMinLng + rMaxLng) / 2;
+
+    // Add 30% padding, enforce a minimum viewport so very short routes don't over-zoom
+    const MIN_HALF_LAT = 0.008;
+    const padLat = Math.max((rMaxLat - rMinLat) * 0.65, MIN_HALF_LAT);
+    const padLng = Math.max((rMaxLng - rMinLng) * 0.65, MIN_HALF_LAT / Math.cos(cLat * Math.PI / 180));
+
+    const minLat = cLat - padLat, maxLat = cLat + padLat;
+    const minLng = cLng - padLng, maxLng = cLng + padLng;
     const dLat = maxLat - minLat, dLng = maxLng - minLng;
 
     // Grid sized so chars fill a square: ROWS = COLS * charWidth/charHeight
@@ -725,7 +819,7 @@ async function appendAsciiHeatmap(url) {
 
     function makeTopBorder(label, cols) {
       const inner = label ? ' ' + label + ' ' : '';
-      const used = 2 + inner.length; // ┌ + inner + ... before ┐
+      const used = 2 + inner.length;
       const right = Math.max(0, cols - used);
       return '┌─' + inner + '─'.repeat(right) + '┐';
     }
@@ -802,9 +896,10 @@ function openName(name, skipEcho) {
   }
   if (e.type === 'file') {
     if (!skipEcho) appendPromptEcho(cwd, 'cat ' + name);
-    if (e.cat) appendLine('mid', e.cat);
+    if (e.blocks) appendBlocks(e.blocks);
+    else if (e.cat) appendCat('mid', e.cat);
     if (e.links?.length) appendLinks(e.links);
-    if (!e.cat && !e.links?.length) appendLine('dim', '(empty)');
+    if (!e.blocks && !e.cat && !e.links?.length) appendLine('dim', '(empty)');
     appendSpacer();
     scrollBottom();
     return;
@@ -883,8 +978,9 @@ function run(raw) {
     const e = tgt ? findEntry(cwd, tgt) : null;
     if (!e) {
       appendLine('dim', 'cat: ' + (tgt || '(missing operand)') + ': no such file');
-    } else if (e.cat || e.links?.length) {
-      if (e.cat) appendLine('mid', e.cat);
+    } else if (e.blocks || e.cat || e.links?.length) {
+      if (e.blocks) appendBlocks(e.blocks);
+      else if (e.cat) appendCat('mid', e.cat);
       if (e.links?.length) appendLinks(e.links);
     } else {
       appendLine('dim', e.name + ': is a directory. try `cd ' + e.name + '`.');
@@ -1162,6 +1258,8 @@ inputEl.addEventListener('keydown', e => {
 
 document.addEventListener('click', e => {
   if (e.target.closest('a, button, input, textarea')) return;
+  const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  if (isTouchDevice && !e.target.closest('#prompt-live')) return;
   inputEl.focus({ preventScroll: true });
 });
 
@@ -1217,7 +1315,8 @@ function boot() {
   updateFooter();
   inputEl.value = 'cat .intro';
   ghostEl.textContent = 'cat .intro';
-  inputEl.focus({ preventScroll: true });
+  const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  if (!isTouchDevice) inputEl.focus({ preventScroll: true });
 }
 
 boot();

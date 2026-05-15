@@ -112,24 +112,73 @@ export const siteConfig = {
       skills: [],
       files: [
         {
-          name: "Crib",
+          name: "build-crib",
           content:
             "Want to make a crib from scratch for baby",
         },
         {
-          name: "bikes",
-          content:
-            "I want to build out my own road bike. Maybe with chinease unnamed carbon frame? more research to be done.",
+          name: "get-bike",
+          blocks: [
+            {title:"Bikes", content:"I want to build out my own road bike. Maybe with chinease unnamed carbon frame? more research to be done. Also considering buying used or new bikes. So far the biggest considerations are:",},
+            {bullets: [
+            "2014 Trek Madone 5.9 with ultegra di2 groupset",
+            "Walmart Ozark Trail gravelbike",
+          ]},{content:"So far it looks to be incredibly hard to find a deal because everyone seem to think their 30 year old bike is a rare collectors item made out of pure gold"},
+          {
+            photo:"https://res.cloudinary.com/drey6ump8/image/upload/q_auto/f_auto/v1777698476/IMG_1307_ulaeqo.jpg",caption:"test of picture in project",
+          },
+          ],
         },
         {
-          name: "printer",
+          name: "print-pictures",
           content:
             "Get my canon selphy printer again, miss being able to print photos at any given time.",
         },
         {
-          name: "español",
+          name: "learn-español",
           content:
             "Quisiera hablar Espanol para de fin de anos. Yo tengo 102 dias en dualingo ahora y creo que me esta yendo bien",
+        },
+        {
+          name: "build-self-water-planter",
+          hidden: true,
+          blocks:[
+            {
+              title:"Self watering planter",
+              bullets:[
+                "",
+                "",            
+              ],
+              content:"I've always wanted to build a automatic planter that water itself based on previous rain, sun and shade. I will need the following.",
+            },
+            {
+              bullets:[
+                "Hoses",
+                "Raspberry PI",
+                "Pumps",
+              ]
+            },
+            {
+              photo:"url"
+            }
+          ]
+        },
+        {
+          name: "template",
+          hidden: true,
+          blocks:[
+            {
+              title:"",
+              bullets:[
+                "",
+                "",            
+              ],
+              content:"",
+            },
+            {
+              photo:"url"
+            }
+          ]
         },
       ],
     },
