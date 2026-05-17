@@ -73,7 +73,12 @@ const photosData = (rawPhotos as string[]).map(path => ({
   :global(.term-line.dim) { color: var(--text-dim); }
   :global(.term-line.mid) { color: var(--text-mid); }
   :global(.cat-bullet) { padding-left: 2ch; text-indent: -2ch; white-space: pre-wrap; word-break: break-word; }
-  :global(.cat-title) { color: var(--text); font-size: 1.6em; line-height: 2.25; letter-spacing: 0.04em; margin-bottom: 6px; }
+  :global(.cat-title) {
+    display: inline-block; font-size: 13px !important; line-height: inherit; letter-spacing: 0.04em; margin-bottom: 6px;
+    background: var(--text); color: var(--bg); padding: 0 4px;
+    box-shadow: 0 0 8px var(--text-mid), 0 0 20px var(--text-dim);
+    text-shadow: 0 0 4px var(--text-dim);
+  }
 
   :global(.prompt-row) { display: flex; gap: 6px; align-items: baseline; color: var(--text-mid); }
   :global(.prompt) { flex: 0 0 auto; color: var(--text-dim); }
@@ -83,6 +88,11 @@ const photosData = (rawPhotos as string[]).map(path => ({
   :global(.prompt .cwd-home:hover) { text-decoration: underline; }
   :global(.prompt .at), :global(.prompt .dollar) { color: var(--text-dim); }
   :global(.echo-cmd) { color: var(--text); }
+  :global(.echo-arg) {
+    background: var(--text); color: var(--bg); padding: 0 4px;
+    box-shadow: 0 0 8px var(--text-mid), 0 0 20px var(--text-dim);
+    text-shadow: 0 0 4px var(--text-dim);
+  }
 
   :global(.input-wrap) { flex: 1; position: relative; display: inline-block; min-height: 22px; }
   :global(.ghost) { color: var(--text); white-space: pre; }
@@ -169,8 +179,12 @@ const photosData = (rawPhotos as string[]).map(path => ({
     :global(div.ls-row span:nth-child(4)) { display: none; }
 
     /* Search rows override inline grid: hide perms, show domain + title */
-    :global(a.ls-row) { grid-template-columns: 90px 1fr !important; gap: 8px; }
-    :global(a.ls-row span:nth-child(1)) { display: none; }
+    :global(a.ls-row) { grid-template-columns: 1fr !important; gap: 8px; }
+    :global(a.ls-row span:nth-child(1)),
+    :global(a.ls-row span:nth-child(2)),
+    :global(a.ls-row span:nth-child(3)),
+    :global(a.ls-row span:nth-child(4)),
+    :global(a.ls-row span:nth-child(5)) { display: none; }
 
     /* Photos full width */
     :global(.photo-inline) { max-width: 100%; }
@@ -230,7 +244,7 @@ PROJECTS_CONFIG.forEach(proj => {
     } else {
       blocks = [{ content: f.content, bullets: f.bullets }];
     }
-    files.push({ name: f.name, type: 'file', hidden: f.hidden ?? false, perms: '-rw-r--r--', size: '—', year, blocks });
+    files.push({ name: f.name, type: 'file', hidden: f.hidden ?? false, perms: '-rw-r--r--', size: '—', year: f.year ?? year, blocks });
   });
   const linkRows = proj.links?.length ? proj.links : (proj.link ? [{ label: proj.name, href: proj.link }] : []);
   if (linkRows.length) files.push({ name: 'links', type: 'file', hidden: false, perms: '-rw-r--r--', size: '—', year, links: linkRows });
@@ -420,7 +434,12 @@ function scrollBottom() {
     });
     return;
   }
-  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const footerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--footer-h')) || 50;
+    const promptEl = document.getElementById('prompt-live');
+    const promptBottom = promptEl.getBoundingClientRect().bottom + window.scrollY;
+    window.scrollTo({ top: promptBottom - window.innerHeight + footerH + 16, behavior: 'smooth' });
+  }));
 }
 
 function updateFooter() {
@@ -505,6 +524,18 @@ function appendBlocks(blocks) {
         wrap.appendChild(d);
       });
     }
+    if (b.links?.length) {
+      const linkBlock = document.createElement('div');
+      linkBlock.className = 'ls-block';
+      b.links.forEach(l => {
+        const a = document.createElement('a');
+        a.href = l.href; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        a.className = 'ls-row type-link';
+        a.innerHTML = `<span>lrwxr-xr-x</span><span>1</span><span>open</span><span>—</span><span>—</span><span class="name">${esc(l.label)} →</span>`;
+        linkBlock.appendChild(a);
+      });
+      wrap.appendChild(linkBlock);
+    }
     if (b.photo) {
       const photoWrap = document.createElement('div');
       photoWrap.className = 'photo-inline';
@@ -528,19 +559,49 @@ function appendBlocks(blocks) {
 function appendPromptEcho(cwdStr, cmd) {
   const row = document.createElement('div');
   row.className = 'prompt-row';
+  const parts = cmd.split(/^(\S+)\s*/);
+  const verb = parts[1] ?? cmd;
+  const args = parts[2] ?? '';
+  const cmdHtml = args
+    ? esc(verb) + ' <span class="echo-arg">' + esc(args) + '</span>'
+    : esc(verb);
   row.innerHTML =
     `<span class="prompt"><span class="user">carl</span><span class="at"> @ studio </span><span class="cwd">${esc(cwdStr)}</span><span class="dollar"> $ </span></span>` +
-    `<span class="echo-cmd">${esc(cmd)}</span>`;
+    `<span class="echo-cmd">${cmdHtml}</span>`;
   scrollEl.appendChild(row);
   return row;
 }
 
 function scrollToEl(el) {
-  requestAnimationFrame(() => {
+  const imgs = [...scrollEl.querySelectorAll('img')].filter(img => !img.complete);
+  const settle = imgs.length
+    ? Promise.all(imgs.map(img => new Promise(r => { img.addEventListener('load', r, { once: true }); img.addEventListener('error', r, { once: true }); })))
+    : Promise.resolve();
+  settle.then(() => requestAnimationFrame(() => {
     const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 60;
     const top = el.getBoundingClientRect().top + window.scrollY - headerH - 16;
-    window.scrollTo({ top, behavior: 'smooth' });
-  });
+    window.scrollTo({ top, behavior: 'instant' });
+  }));
+}
+
+function smartScroll(anchorEl) {
+  const imgs = [...scrollEl.querySelectorAll('img')].filter(img => !img.complete);
+  const settle = imgs.length
+    ? Promise.all(imgs.map(img => new Promise(r => { img.addEventListener('load', r, { once: true }); img.addEventListener('error', r, { once: true }); })))
+    : Promise.resolve();
+  settle.then(() => requestAnimationFrame(() => {
+    const style = getComputedStyle(document.documentElement);
+    const headerH = parseInt(style.getPropertyValue('--header-h')) || 60;
+    const footerH = parseInt(style.getPropertyValue('--footer-h')) || 50;
+    const usableViewport = window.innerHeight - headerH - footerH;
+    const anchorDocTop = anchorEl.getBoundingClientRect().top + window.scrollY;
+    const contentHeight = document.body.scrollHeight - anchorDocTop;
+    if (contentHeight > usableViewport * 0.75) {
+      window.scrollTo({ top: anchorDocTop - headerH - 8, behavior: 'instant' });
+    } else {
+      scrollBottom();
+    }
+  }));
 }
 
 function appendLsLong(rows) {
@@ -555,9 +616,19 @@ function appendLsLong(rows) {
     const row = document.createElement('div');
     row.className = 'ls-row type-' + r.type + (r.hidden ? ' is-hidden' : '');
     row.title = 'open ' + r.name;
+    let childCount = 1;
+    if (r.type === 'dir') {
+      const dirPath = renderPath === '~' ? '~/' + r.name : renderPath + '/' + r.name;
+      childCount = visible(listAt(dirPath), false).length || 1;
+    } else if (r.blocks) {
+      const text = r.blocks.map(b => [b.title, b.content, ...(b.bullets ?? [])].filter(Boolean).join('\n')).join('\n');
+      childCount = text.split('\n').filter(l => l.trim()).length || 1;
+    } else if (r.cat) {
+      childCount = r.cat.split('\n').filter(l => l.trim()).length || 1;
+    }
     row.innerHTML =
       `<span>${esc(r.perms)}</span>` +
-      `<span>1</span>` +
+      `<span>${childCount}</span>` +
       `<span>${cmdHint(r)}</span>` +
       `<span>${esc(r.size)}</span>` +
       `<span>${esc(r.year)}</span>` +
@@ -895,13 +966,13 @@ function openName(name, skipEcho) {
     return;
   }
   if (e.type === 'file') {
-    if (!skipEcho) appendPromptEcho(cwd, 'cat ' + name);
+    const echoEl = skipEcho ? null : appendPromptEcho(cwd, 'cat ' + name);
     if (e.blocks) appendBlocks(e.blocks);
     else if (e.cat) appendCat('mid', e.cat);
     if (e.links?.length) appendLinks(e.links);
     if (!e.blocks && !e.cat && !e.links?.length) appendLine('dim', '(empty)');
     appendSpacer();
-    scrollBottom();
+    if (echoEl) smartScroll(echoEl); else scrollBottom();
     return;
   }
   if (e.type === 'link') {
@@ -1313,8 +1384,28 @@ function boot() {
   );
   appendSpacer();
   updateFooter();
-  inputEl.value = 'cat .intro';
-  ghostEl.textContent = 'cat .intro';
+  const bootPath = new URLSearchParams(window.location.search).get('boot');
+  if (bootPath && listAt('~/' + bootPath).length) {
+    appendPromptEcho('~', 'cd ' + bootPath);
+    cwd = '~/' + bootPath;
+    updateFooter();
+    appendSpacer();
+    const entries = visible(listAt(cwd), false);
+    const firstEcho = appendPromptEcho(cwd, 'cat ' + (entries.find(e => e.type === 'file')?.name ?? ''));
+    entries.filter(e => e.type === 'file').forEach((e, i) => {
+      if (i > 0) appendPromptEcho(cwd, 'cat ' + e.name);
+      if (e.blocks) appendBlocks(e.blocks);
+      else if (e.cat) appendCat('mid', e.cat);
+      if (e.links?.length) appendLinks(e.links);
+      appendSpacer();
+    });
+    history.scrollRestoration = 'manual';
+    requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo({ top: 0 })));
+  } else {
+    inputEl.value = 'cat .intro';
+    ghostEl.textContent = 'cat .intro';
+  }
+
   const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
   if (!isTouchDevice) inputEl.focus({ preventScroll: true });
 }

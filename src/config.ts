@@ -64,13 +64,15 @@ export const siteConfig = {
       files: [
         {
           name: "why",
-          content:
-            "i wanted a notebook for places, not for words. something that runs in the background, never asks for input, and gives me a quiet map of a year — every café, every detour, every two-hour walk that i forget i took.",
+          blocks: [
+            { title: "why", content: "i wanted a notebook for places, not for words. something that runs in the background, never asks for input, and gives me a quiet map of a year — every café, every detour, every two-hour walk that i forget i took." },
+          ],
         },
         {
           name: "how",
-          content:
-            "significant-location updates on ios, batched to disk, replayed into a tile renderer. no servers. no accounts. export to gpx when you want to take your year with you.",
+          blocks: [
+            { title: "how", content: "significant-location updates on ios, batched to disk, replayed into a tile renderer. no servers. no accounts. export to gpx when you want to take your year with you." },
+          ],
         },
       ],
     },
@@ -90,20 +92,22 @@ export const siteConfig = {
       files: [
         {
           name: "thesis",
-          content:
-            "wood is anisotropic and hygroscopic. that is two boring words for a quiet kind of magic: a flat board, left in a different room for a week, will cup or twist or split. cabinetmakers have known this for a thousand years; engineers model it badly.\n\ni spent a year poking at small specimens of picea abies and quercus robur, watching them shrink between 12% and 6% moisture content, trying to predict — from species, cut and grain angle — which way they would move.",
+          blocks: [
+            { title: "thesis", content: "wood is anisotropic and hygroscopic. that is two boring words for a quiet kind of magic: a flat board, left in a different room for a week, will cup or twist or split. cabinetmakers have known this for a thousand years; engineers model it badly.\n\ni spent a year poking at small specimens of picea abies and quercus robur, watching them shrink between 12% and 6% moisture content, trying to predict — from species, cut and grain angle — which way they would move." },
+          ],
         },
         {
           name: "result",
-          content:
-            "a finite-element model that gets within ~14% of measured deformation on flatsawn boards, and within ~22% on quartersawn. a short paper, a long appendix, and an enormous respect for whoever made the chair you are sitting on.",
+          blocks: [
+            { title: "result", content: "a finite-element model that gets within ~14% of measured deformation on flatsawn boards, and within ~22% on quartersawn. a short paper, a long appendix, and an enormous respect for whoever made the chair you are sitting on." },
+          ],
         },
       ],
     },
     {
       name: "Things — Workshop",
       slug: "pipeline",
-      year: "2022",
+      year: "Current",
       hidden: false,
       description:
         "workshop · ongoing\nash · oak · linseed oil · patience\n\nfurniture and small objects built in a one-room workshop in stockholm. stools, shelves, a folding desk, a lamp that did not work.",
@@ -113,11 +117,31 @@ export const siteConfig = {
       files: [
         {
           name: "build-crib",
-          content:
-            "Want to make a crib from scratch for baby",
+          blocks: [
+            { title: "build-crib", 
+              content: " I want to make a crib from scratch for the baby. I think it would be meaningful for me to put effort and labor in to something for him that will last.",
+              bullets:[
+                "Thinking made in birch",
+                "Simple design",
+                "Easy to build",
+                "Sturdy"
+              ]
+            },{
+              content:" Simply just something I can and will be able to build. It will require some hand tools though and Im thinking I'll need something like this to start:",
+              bullets: [
+                "Thickness planer and jointer for making panels",
+                "Circle saw",
+                "Sander",
+                "Router",
+                "Misc hand tools",
+                "Budget of a few hundred maybe"
+              ]
+            }
+          ],
         },
         {
           name: "get-bike",
+          year: "2026",
           blocks: [
             {title:"Bikes", content:"I want to build out my own road bike. Maybe with chinease unnamed carbon frame? more research to be done. Also considering buying used or new bikes. So far the biggest considerations are:",},
             {bullets: [
@@ -125,22 +149,30 @@ export const siteConfig = {
             "Walmart Ozark Trail gravelbike",
           ]},{content:"So far it looks to be incredibly hard to find a deal because everyone seem to think their 30 year old bike is a rare collectors item made out of pure gold"},
           {
-            photo:"https://res.cloudinary.com/drey6ump8/image/upload/q_auto/f_auto/v1777698476/IMG_1307_ulaeqo.jpg",caption:"test of picture in project",
-          },
+            photo:"https://www.garbaruk.com/web/content/102304?download=false",caption:"test of picture in project",
+          },{
+            content:"Potentially this",
+            links: [{label:"Seraph", href:"https://docs.google.com/presentation/d/10e2WU9GFn-puuL61Fdcj6eTDnwwzp-FniAAtjsnUP84/edit?slide=id.g39b589e592d_0_0#slide=id.g39b589e592d_0_0"}]
+          }
           ],
         },
         {
           name: "print-pictures",
-          content:
-            "Get my canon selphy printer again, miss being able to print photos at any given time.",
+          year: "2026",
+          blocks: [
+            { title: "print-pictures", content: "Get my canon selphy printer again, miss being able to print photos at any given time." },
+          ],
         },
         {
           name: "learn-español",
-          content:
-            "Quisiera hablar Espanol para de fin de anos. Yo tengo 102 dias en dualingo ahora y creo que me esta yendo bien",
+          year: "2026",
+          blocks: [
+            { title: "learn-español", content: "Quisiera hablar Espanol para de fin de anos. Yo tengo 102 dias en dualingo ahora y creo que me esta yendo bien" },
+          ],
         },
         {
           name: "build-self-water-planter",
+          year: "2026",
           hidden: true,
           blocks:[
             {
