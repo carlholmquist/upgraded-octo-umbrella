@@ -136,6 +136,16 @@ export const siteConfig = {
                 "Misc hand tools",
                 "Budget of a few hundred maybe"
               ]
+            },{
+              links: [{label:"Makita Track Saw", href:"https://www.acmetools.com/makita-40v-max-xgt-6-1-2-inch-plunge-circular-saw-brushless-cordless-kit-with-55-inch-guide-rail-bundle-mak000011270/MAK000011270.html"},
+                {label:"Makita Router", href:"https://www.amazon.com/Makita-XTR01Z-Lithium-Ion-Brushless-Cordless/dp/B074BYS49M/ref=sr_1_1?crid=GTN5D0VI57GN&dib=eyJ2IjoiMSJ9.oUAY_9YIgEMcVHUKMd6qyXzgx5QI5eAQCesOR192PRw2L9vxK98D2nLjh09XhK4WmMkXLw3APttqKPMU95GkXI2stFh0Rb1K4BHXYmqr2OjNRTB9Ct5ycEm8gZw7zDJHJlzdUyibGUM4PRvfsntI5nFZNa4I_Xvn-CwDjzbopXUnCtRtpxkjcD7okwYGufKYTNpzBWYtvSeV7Pbih_jcVAP0Cf8CjjdeYXvd2AeSIU5a48JH02qtR03_d3iY6rdyGVa5EDxTelRdO20L2wX9_fcekQteWKV4-VyeUsicwoY.NfTeu6kHWbAJ3ilpcpFZBhFLgLC4lneIKiFbaEFOOiw&dib_tag=se&keywords=makita%2Brouter%2B18V&qid=1779298310&sprefix=makita%2Brouter%2B18%2Caps%2C315&sr=8-1&th=1"},
+                {label:"RYOBI basic 6pc set", href:"https://www.homedepot.com/p/RYOBI-ONE-18V-Cordless-6-Tool-Combo-Kit-with-Compact-Battery-4-0-Ah-Battery-and-Charger-PCL1600K2/317987591"}
+              ]
+            },
+            {
+              content:"Here are some inspirational posts:",
+              // photo:"https://preview.redd.it/crib-i-designed-for-the-new-baby-made-from-local-ash-v0-9pbu63w0j8f91.jpg?width=1080&crop=smart&auto=webp&s=337357a020fcfeba3979360bae91537ca7acff9a",
+              links: [{label:"Ash crib", href:"https://www.reddit.com/r/woodworking/comments/we34w7/crib_i_designed_for_the_new_baby_made_from_local/"}]
             }
           ],
         },
@@ -193,6 +203,29 @@ export const siteConfig = {
             {
               photo:"url"
             }
+          ]
+        },
+        {
+          name: "wants",
+          hidden: false,
+          blocks:[
+            {
+              title:"Things that i want but maybe dont need",
+              links: [
+                {
+                  label:"Tactile Turn mechanical pencil",
+                  href:"https://tactileturn.com/products/pencil?variant=39259114995817"
+                },
+                {
+                  label:"Trek Checkpoint Carbon",
+                  href:"https://www.trekbikes.com/us/en_US/bikes/bikepacking-touring-bikes/checkpoint/checkpoint-sl/f/F224-1/checkpoint-sl-5-axs-gen-3/47071/5321633"
+                },
+                {
+                  label:"Volvo XC90",
+                  href:"https://www.volvocars.com/us/cars/xc90/"
+                },
+              ]
+            },
           ]
         },
         {

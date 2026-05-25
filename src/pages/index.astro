@@ -1182,6 +1182,17 @@ function run(raw) {
               `<span class="name" style="overflow:hidden;text-overflow:ellipsis">${esc(item.title)} →</span>`;
             block.appendChild(row);
           });
+          const googleRow = document.createElement('a');
+          googleRow.href = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+          googleRow.target = '_blank';
+          googleRow.rel = 'noopener noreferrer';
+          googleRow.className = 'ls-row type-link';
+          googleRow.style.gridTemplateColumns = '100px 160px 1fr';
+          googleRow.innerHTML =
+            `<span>lrwxr-xr-x</span>` +
+            `<span style="color:var(--text-mid)">google.com</span>` +
+            `<span class="name">search google for "${esc(query)}" →</span>`;
+          block.appendChild(googleRow);
           container.appendChild(block);
         }
         scrollBottom();
