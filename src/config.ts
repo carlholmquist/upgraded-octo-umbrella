@@ -127,14 +127,14 @@ export const siteConfig = {
                 "Sturdy"
               ]
             },{
-              content:" Simply just something I can and will be able to build. It will require some hand tools though and Im thinking I'll need something like this to start:",
+              content:"I've ended up getting a simple starter kit of Ryobi tools. Thinking about building a workbench first of just simple 2 x 4s and some mdf possibly because i would need something to actually build the crib on. Still I'd need some way of dimensioning lumber still, a planer would be the nicest i think but maybe a bit pricey. Also need clamps, maybe some chisels.",
               bullets: [
                 "Thickness planer and jointer for making panels",
-                "Circle saw",
                 "Sander",
                 "Router",
-                "Misc hand tools",
-                "Budget of a few hundred maybe"
+                "Chisels",
+                "Square",
+
               ]
             },{
               links: [{label:"Makita Track Saw", href:"https://www.acmetools.com/makita-40v-max-xgt-6-1-2-inch-plunge-circular-saw-brushless-cordless-kit-with-55-inch-guide-rail-bundle-mak000011270/MAK000011270.html"},
@@ -226,6 +226,23 @@ export const siteConfig = {
                 },
               ]
             },
+          ]
+        },
+        {
+          name: "Art",
+          hidden: true,
+          blocks:[
+            {
+              title:"Painting and drawing",
+              bullets:[
+                "",
+                "",            
+              ],
+              content:"I have this yearning or maybe dream to paint. It looks so fun and tactile I think about it a lot",
+            },
+            {
+              photo:"url"
+            }
           ]
         },
         {
@@ -388,7 +405,8 @@ export const siteConfig = {
     {
       catname: "Developer",
       links: [
-        { label: "github", url: "https://www.github.com" },
+        { label: "Test VIM", url:"https://opensource.com/article/19/3/getting-started-vim"},
+	{ label: "github", url: "https://www.github.com" },
         { label: "Cloudinary", url: "https://console.cloudinary.com/" },
         { label: "holmquist.studio", url: "https://www.holmquist.studio" },
         { label: "Render", url: "https://dashboard.render.com" },
