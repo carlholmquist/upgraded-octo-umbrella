@@ -93,7 +93,11 @@ export const siteConfig = {
         {
           name: "thesis",
           blocks: [
-            { title: "thesis", content: "wood is anisotropic and hygroscopic. that is two boring words for a quiet kind of magic: a flat board, left in a different room for a week, will cup or twist or split. cabinetmakers have known this for a thousand years; engineers model it badly.\n\ni spent a year poking at small specimens of picea abies and quercus robur, watching them shrink between 12% and 6% moisture content, trying to predict — from species, cut and grain angle — which way they would move." },
+            { title: "thesis", content: "Investigated correlations between wood anatomy and mechanical properties in Swedish-grown lodgepole pine (Pinus contorta) as part of my MSc thesis at Luleå University of Technology. The study analyzed 432 timber specimens sourced from four geographic locations across Sweden, measuring ring width, latewood ratio, and swelling and correlating these against bending strength, modulus of elasticity, and density.
+
+Developed a custom Python image analysis pipeline to automate cross-sectional measurements from high resolution timber scans. Statistical analysis included Pearson correlation and one-way ANOVA.
+
+Conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products" },
           ],
         },
         {
@@ -110,7 +114,7 @@ export const siteConfig = {
       year: "Current",
       hidden: false,
       description:
-        "workshop · ongoing\nash · oak · linseed oil · patience\n\nfurniture and small objects built in a one-room workshop in stockholm. stools, shelves, a folding desk, a lamp that did not work.",
+        "Stuff on the horizon",
       link: "",
       links: [],
       skills: [],
