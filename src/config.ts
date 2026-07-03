@@ -385,7 +385,9 @@ Conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wo
         { label: "Instagram", url: "https://instagram.com" },
         { label: "Facebook", url: "https://facebook.com" },
         { label: "reddit", url: "https://reddit.com" },
-      ],
+        { label: "tiktok", url: "https://www.tiktok.com"},
+	{ label: "threads", url "https://www.threads.com"},
+],
     },
     {
       catname: "Google",
