@@ -93,11 +93,7 @@ export const siteConfig = {
         {
           name: "thesis",
           blocks: [
-            { title: "thesis", content: "Investigated correlations between wood anatomy and mechanical properties in Swedish-grown lodgepole pine (Pinus contorta) as part of my MSc thesis at Luleå University of Technology. The study analyzed 432 timber specimens sourced from four geographic locations across Sweden, measuring ring width, latewood ratio, and swelling and correlating these against bending strength, modulus of elasticity, and density.
-
-Developed a custom Python image analysis pipeline to automate cross-sectional measurements from high resolution timber scans. Statistical analysis included Pearson correlation and one-way ANOVA.
-
-Conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products" },
+            { title: "thesis", content: "Investigated correlations between wood anatomy and mechanical properties in Swedish-grown lodgepole pine (Pinus contorta) as part of my MSc thesis at Luleå University of Technology. The study analyzed 432 timber specimens sourced from four geographic locations across Sweden, measuring ring width, latewood ratio, and swelling and correlating these against bending strength, modulus of elasticity, and density. Developed a custom Python image analysis pipeline to automate cross-sectional measurements from high resolution timber scans. Statistical analysis included Pearson correlation and one-way ANOVA. Conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products" },
           ],
         },
         {
@@ -386,8 +382,8 @@ Conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wo
         { label: "Facebook", url: "https://facebook.com" },
         { label: "reddit", url: "https://reddit.com" },
         { label: "tiktok", url: "https://www.tiktok.com"},
-	{ label: "threads", url "https://www.threads.com"},
-],
+	      { label: "threads", url "https://www.threads.com"},
+      ],
     },
     {
       catname: "Google",
