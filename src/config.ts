@@ -65,13 +65,13 @@ export const siteConfig = {
         {
           name: "why",
           blocks: [
-            { title: "why", content: "i wanted a notebook for places, not for words. something that runs in the background, never asks for input, and gives me a quiet map of a year — every café, every detour, every two-hour walk that i forget i took." },
+            { title: "why", content: "because" },
           ],
         },
         {
           name: "how",
           blocks: [
-            { title: "how", content: "significant-location updates on ios, batched to disk, replayed into a tile renderer. no servers. no accounts. export to gpx when you want to take your year with you." },
+            { title: "how", content: "ai " },
           ],
         },
       ],
@@ -93,13 +93,7 @@ export const siteConfig = {
         {
           name: "thesis",
           blocks: [
-            { title: "thesis", content: "Investigated correlations between wood anatomy and mechanical properties in Swedish-grown lodgepole pine (Pinus contorta) as part of my MSc thesis at Luleå University of Technology. The study analyzed 432 timber specimens sourced from four geographic locations across Sweden, measuring ring width, latewood ratio, and swelling and correlating these against bending strength, modulus of elasticity, and density. Developed a custom Python image analysis pipeline to automate cross-sectional measurements from high resolution timber scans. Statistical analysis included Pearson correlation and one-way ANOVA. Conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products" },
-          ],
-        },
-        {
-          name: "result",
-          blocks: [
-            { title: "result", content: "a finite-element model that gets within ~14% of measured deformation on flatsawn boards, and within ~22% on quartersawn. a short paper, a long appendix, and an enormous respect for whoever made the chair you are sitting on." },
+            { title: "thesis", content: "Investigated correlations between wood anatomy and mechanical properties in Swedish-grown lodgepole pine (Pinus contorta) as part of my MSc thesis at Luleå University of Technology. The study analyzed 432 timber specimens sourced from four geographic locations across Sweden, measuring ring width, latewood ratio, and swelling and correlating these against bending strength, modulus of elasticity, and density.\n\ Developed a custom Python image analysis pipeline to automate cross-sectional measurements from high resolution timber scans. Statistical analysis included Pearson correlation and one-way ANOVA.\n\ Conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products" },
           ],
         },
       ],
@@ -119,7 +113,7 @@ export const siteConfig = {
           name: "build-crib",
           blocks: [
             { title: "build-crib", 
-              content: " I want to make a crib from scratch for the baby. I think it would be meaningful for me to put effort and labor in to something for him that will last.",
+              content: " I want to make a crib from scratch for the baby. I think it would be meaningful for me to put effort in to something for him that will last.",
               bullets:[
                 "Thinking made in birch",
                 "Simple design",
@@ -356,7 +350,11 @@ export const siteConfig = {
   Bookmarks: [
     {
       catname: "News",
-      links: [{ label: "DN", url: "https://dn.se" }],
+      links: [
+        { label: "DN", url: "https://dn.se" },
+        { label: "Expressen", url: "https://expressen.se" },
+        { label: "HT", url: "https://ht.se" },
+      ],
     },
     {
       catname: "Engineering",
@@ -382,7 +380,7 @@ export const siteConfig = {
         { label: "Facebook", url: "https://facebook.com" },
         { label: "reddit", url: "https://reddit.com" },
         { label: "tiktok", url: "https://www.tiktok.com"},
-	      { label: "threads", url "https://www.threads.com"},
+	      { label: "threads", url: "https://www.threads.com"},
       ],
     },
     {
@@ -408,7 +406,7 @@ export const siteConfig = {
       catname: "Developer",
       links: [
         { label: "Test VIM", url:"https://opensource.com/article/19/3/getting-started-vim"},
-	{ label: "github", url: "https://www.github.com" },
+	      { label: "github", url: "https://www.github.com" },
         { label: "Cloudinary", url: "https://console.cloudinary.com/" },
         { label: "holmquist.studio", url: "https://www.holmquist.studio" },
         { label: "Render", url: "https://dashboard.render.com" },
