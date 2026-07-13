@@ -82,7 +82,7 @@ export const siteConfig = {
       year: "2023",
       hidden: false,
       description:
-        "master thesis · archived\npython · abaqus · 24 specimens\n\na bench-and-model study of how solid wood deforms when its moisture content swings, and a small toolchain for predicting warp from species and cut.",
+        "master thesis · archived\npython · 432 specimens\n\n",
       link: "",
       links: [
         { label: "thesis.pdf", href: "#" },
@@ -93,7 +93,7 @@ export const siteConfig = {
         {
           name: "thesis",
           blocks: [
-            { title: "thesis", content: "Investigated correlations between wood anatomy and mechanical properties in Swedish-grown lodgepole pine (Pinus contorta) as part of my MSc thesis at Luleå University of Technology. The study analyzed 432 timber specimens sourced from four geographic locations across Sweden, measuring ring width, latewood ratio, and swelling and correlating these against bending strength, modulus of elasticity, and density.\n\ Developed a custom Python image analysis pipeline to automate cross-sectional measurements from high resolution timber scans. Statistical analysis included Pearson correlation and one-way ANOVA.\n\ Conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products" },
+            { title: "thesis", content: "Investigated correlations between wood anatomy and mechanical properties in Swedish-grown lodgepole pine (Pinus contorta) as part of my MSc thesis at Luleå University of Technology. The study analyzed 432 timber specimens sourced from four geographic locations across Sweden, measuring ring width, latewood ratio, and swelling and correlating these against bending strength, modulus of elasticity, and density.\n\ \n\Developed a custom Python image analysis pipeline to automate cross-sectional measurements from high resolution timber scans. Statistical analysis included Pearson correlation and one-way ANOVA.\n\ \n\Conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products" },
           ],
         },
       ],
@@ -113,7 +113,7 @@ export const siteConfig = {
           name: "build-crib",
           blocks: [
             { title: "build-crib", 
-              content: " I want to make a crib from scratch for the baby. I think it would be meaningful for me to put effort in to something for him that will last.",
+              content: "I want to build a crib",
               bullets:[
                 "Thinking made in birch",
                 "Simple design",
@@ -121,7 +121,7 @@ export const siteConfig = {
                 "Sturdy"
               ]
             },{
-              content:"I've ended up getting a simple starter kit of Ryobi tools. Thinking about building a workbench first of just simple 2 x 4s and some mdf possibly because i would need something to actually build the crib on. Still I'd need some way of dimensioning lumber still, a planer would be the nicest i think but maybe a bit pricey. Also need clamps, maybe some chisels.",
+              content:"I've ended up getting a simple starter kit of Ryobi tools. Might build a workbench first out of just simple 2 x 4s and some mdf. Still I'd need a way of dimensioning lumber still, a planer would be the best. Also need clamps and some chisels.",
               bullets: [
                 "Thickness planer and jointer for making panels",
                 "Sander",
@@ -147,11 +147,11 @@ export const siteConfig = {
           name: "get-bike",
           year: "2026",
           blocks: [
-            {title:"Bikes", content:"I want to build out my own road bike. Maybe with chinease unnamed carbon frame? more research to be done. Also considering buying used or new bikes. So far the biggest considerations are:",},
+            {title:"Bikes", content:"I want to build out my own road bike, more research to be done. Also considering buying used or new bikes. So far the biggest considerations are:",},
             {bullets: [
             "2014 Trek Madone 5.9 with ultegra di2 groupset",
             "Walmart Ozark Trail gravelbike",
-          ]},{content:"So far it looks to be incredibly hard to find a deal because everyone seem to think their 30 year old bike is a rare collectors item made out of pure gold"},
+          ]},{content:"It is not easy fining good value used deals right now."},
           {
             photo:"https://www.garbaruk.com/web/content/102304?download=false",caption:"test of picture in project",
           },{
@@ -164,7 +164,7 @@ export const siteConfig = {
           name: "print-pictures",
           year: "2026",
           blocks: [
-            { title: "print-pictures", content: "Get my canon selphy printer again, miss being able to print photos at any given time." },
+            { title: "print-pictures", content: "Get my canon selphy printer again so I can print pictures at any given time." },
           ],
         },
         {
@@ -185,7 +185,7 @@ export const siteConfig = {
                 "",
                 "",            
               ],
-              content:"I've always wanted to build a automatic planter that water itself based on previous rain, sun and shade. I will need the following.",
+              content:"I want to build a automatic planter that water itself based on previous rain, sun and shade. Need to research more but I will at least need the following.",
             },
             {
               bullets:[
@@ -232,7 +232,7 @@ export const siteConfig = {
                 "",
                 "",            
               ],
-              content:"I have this yearning or maybe dream to paint. It looks so fun and tactile I think about it a lot",
+              content:"I like drawing and painting, I wish I did it more.",
             },
             {
               photo:"url"
@@ -329,10 +329,6 @@ export const siteConfig = {
       dateRange: "aug 2012 – jan 2013",
       hidden: true,
       achievements: [
-        "Degree validated by NCEES without deficiencies",
-        "Thesis conducted in collaboration with RISE Research Institutes of Sweden and Holmen Wood Products",
-        "Coursework spanning structural engineering, building physics, and computational methods",
-        "Main body of studies between 2015 and 2020, thesis defended 2023, degree awarded in 2025",
       ],
     },
     {
@@ -354,6 +350,8 @@ export const siteConfig = {
         { label: "DN", url: "https://dn.se" },
         { label: "Expressen", url: "https://expressen.se" },
         { label: "HT", url: "https://ht.se" },
+        { label: "Ground News", url: "https://ground.news"},
+        { label: "KHOU", url: "https://www.khou.com"},
       ],
     },
     {
@@ -369,8 +367,8 @@ export const siteConfig = {
       catname: "Web Apps",
       links: [
         { label: "Strudel", url: "https://strudel.cc" },
-        { label: "Claude", url: "https://claude.ai" },
         { label: "ARC FLUIDS", url: "https://prosperousuniverse.com/auth/login?od=https://apex.prosperousuniverse.com/#/cards/c339a71756d1f504ac9cea23444aa725" },
+        { label: "Chess", url: "https://www.chess.com/home"},
       ],
     },
     {
